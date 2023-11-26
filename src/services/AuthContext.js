@@ -1,56 +1,42 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getAuth, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
-import app from '../firebase';
-
+import { onAuthStateChanged, getAuth } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { signIn, signOutUser } from '../services/authService';
+import app from './firebaseConfig'
 
 const AuthContext = createContext();
 
-
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const provider = new GoogleAuthProvider();
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
     const auth = getAuth(app);
-    useEffect(() => {
-        const currentUser = auth.currentUser;
-        if (currentUser !== null) {
-            setUser({
-                'displayName': currentUser.displayName,
-                'email': currentUser.email,
-                'photoURL': currentUser.photoURL,
-                'emailVerified': currentUser.emailVerified,
-                'uid': currentUser.uid
-            });
-
-        } else {
-            setUser({});
-        }
-    }, [auth])
-
-    console.log(user)
-    const signIn = async () => {
-        try {
-            let result = await signInWithRedirect(auth, provider);
-        } catch (error) {
-            console.error(error.message);
-        }
-    };
-
-    const SignOut = () => {
-        signOut(auth).then(() => {
-            console.log('SignOut')
-        }).catch((error) => {
-            console.log(error.message)
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser({
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          emailVerified: user.emailVerified,
+          uid: user.uid,
         });
+        navigate('/home')
+      } else {
         setUser(null);
-    };
+      }
+    });
 
-    return (
-        <AuthContext.Provider value={{ user, signIn, SignOut }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    return () => unsubscribe();
+  }, [navigate]);
+
+  return (
+    <AuthContext.Provider value={{ user, signIn, signOut: signOutUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
-    return useContext(AuthContext);
+  return useContext(AuthContext);
 };

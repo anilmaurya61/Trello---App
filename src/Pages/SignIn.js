@@ -4,14 +4,14 @@ import TrelloIcon from '../assets/trello-logo.svg'
 import GoogleIcon from '../assets/google-icon.png'
 import Profile from '../assets/profile.png'
 import '../styles/SignIn.css'
-import { useAuth } from '../services/AuthContext';
+import MyApp from '../services/title';
+import { signIn } from '../services/authService'
 
 const SignIn = () => {
- 
-  const {signIn} = useAuth();
 
   return (
     <>
+      <MyApp dynamicTitle={"SignIn"} />
       <section className="sign-in-section">
         <div className="sign-in-container">
           <div className="sign-in-box">
