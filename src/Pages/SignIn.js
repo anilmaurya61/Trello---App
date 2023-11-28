@@ -19,7 +19,7 @@ const SignIn = () => {
             <h1>WELCOME</h1>
             <img src={TrelloIcon} alt="TrelloIcon" />
             <p>Log in to continue</p>
-            <Button className='sign-in-btn' variant="outlined" onClick={signIn}>
+            <Button className='sign-in-btn' variant="outlined" onClick={ signIn}>
               <img src={GoogleIcon} alt="Icon" /><span>Google</span>
             </Button>
           </div>

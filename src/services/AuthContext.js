@@ -21,7 +21,9 @@ export const AuthProvider = ({ children }) => {
           emailVerified: user.emailVerified,
           uid: user.uid,
         });
-        navigate('/home')
+        if (window.location.pathname === '/') {
+          navigate('/home');
+        }
       } else {
         setUser(null);
       }

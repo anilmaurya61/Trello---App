@@ -1,23 +1,64 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../services/AuthContext';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { AppBar, Box, Toolbar, Typography, Button, Avatar} from '@mui/material';
+import { AccountCircleOutlined as AccountCircleOutlinedIcon } from '@mui/icons-material';
 import MyApp from '../services/title';
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import TrelloIcon from '../assets/trello-logo.svg';
-import { useNavigate } from 'react-router-dom';
+import TrelloIcon from '../assets/trello-icon.svg';
+import { useNavigate, Link } from 'react-router-dom';
+import CreateBoardPopup from '../Components/CreateBoardPopup';
+import { getImagesFromStorage } from '../services/firebaseStorage'
+import { getBoards, deleteBoard } from '../services/firestoreService'
+import { DeleteForeverTwoTone as DeleteIcon, ModeEdit as EditIcon} from '@mui/icons-material';
+import { BoardsSkeleton } from '../Components/Skeleton';
+import { ToastContainer, toast } from 'react-toastify';
+
+
 
 const Home = () => {
     const { signOut, user } = useAuth();
+    const [isCreateBoardPopupOpen, setIsCreateBoardPopupOpen] = useState(false);
+    const [imageData, setImageData] = useState([]);
+    const [boards, setBoards] = useState([]);
     const navigate = useNavigate()
-    console.log(user);
+
+    useEffect(() => {
+        const fetchData = async (userId) => {
+            try {
+                const boards = await getBoards(userId);
+                setBoards(boards);
+                const images = await getImagesFromStorage();
+                setImageData(images);
+            }
+            catch (err) {
+                toast.error("Error loading data. Please try again.");
+            }
+        };
+        if (user) {
+            fetchData(user?.uid);
+        }
+
+    }, [user]);
+
+    function handleCreateBoardPopup() {
+        setIsCreateBoardPopupOpen(!isCreateBoardPopupOpen);
+    }
+
+    async function handleDeleteBoard(id) {
+        try {
+            const isDeleted = await deleteBoard(id);
+            if (isDeleted) {
+                setBoards((boards) => boards.filter(board => board.id !== id))
+            }
+        }
+        catch (error) {
+            toast.error("Error Deleting Board. Please try again.");
+        }
+    }
 
     return (
         <>
             <MyApp dynamicTitle='Home' />
+            <ToastContainer/>
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
                     <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -26,75 +67,43 @@ const Home = () => {
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             {user?.photoURL ? (
-                                <img
-                                    src={user.photoURL}
-                                    alt="userProfile"
-                                    sx={{ width: '50px', height: '50px', borderRadius: '50%' }}
-                                />
+                                <Avatar alt="Travis Howard" src={user.photoURL} sx={{ marginRight: '5px' }} />
                             ) : (
                                 <AccountCircleOutlinedIcon sx={{ marginRight: '5px' }} />
-                            )}                            <Typography variant="body1">{user?.displayName || "userName"}</Typography>
-                            <Button color="inherit" onClick={()=>{signOut().then(()=>navigate('/')) }} sx={{ marginLeft: '10px' }}>LOGOUT</Button>
+                            )}
+                            <Typography variant="body1">{user?.displayName || "userName"}</Typography>
+                            <Button variant="outlined" color="inherit" onClick={() => { signOut().then(() => navigate('/')) }} sx={{ marginLeft: '10px' }}>LOGOUT</Button>
                         </Box>
                     </Toolbar>
                 </AppBar>
             </Box>
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography sx={{ fontSize: '2rem', fontWeight: '900', margin: '1rem 5rem' }}>Your Boards</Typography>
-                <Box
-                    sx={{
-                        border: '1px solid #ccc',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        marginBottom: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '50%',
-                        marginX: '5rem'
-                    }}
-                >
-                    <Typography sx={{ flexGrow: 1 }}>Board Name</Typography>
-                    <Button sx={{ marginRight: '10px' }}>Edit</Button>
-                    <Button>Delete</Button>
-                </Box>
-                <Box
-                    sx={{
-                        border: '1px solid #ccc',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        marginBottom: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '50%',
-                        marginX: '5rem'
-                    }}
-                >
-                    <Typography sx={{ flexGrow: 1 }}>Board Name</Typography>
-                    <Button sx={{ marginRight: '10px' }}>Edit</Button>
-                    <Button>Delete</Button>
-                </Box>
-                <Box
-                    sx={{
-                        border: '1px solid #ccc',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        marginBottom: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '50%',
-                        marginX: '5rem'
-                    }}
-                >
-                    <Typography sx={{ flexGrow: 1 }}>Board Name</Typography>
-                    <Button sx={{ marginRight: '10px' }}>Edit</Button>
-                    <Button>Delete</Button>
-                </Box>
-                <Button variant="outlined" size="large">
-                    Create New Board
-                </Button>
+                {boards.length === 0?
+                <BoardsSkeleton/>
+                :boards?.map((board) => (
+
+                    <Box key={board.id}
+                        sx={{
+                            border: '1px solid #ccc',
+                            borderRadius: '8px',
+                            padding: '10px 20px',
+                            marginBottom: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '50%',
+                            marginX: '5rem'
+                        }}
+                    >
+                        <Typography sx={{ flexGrow: 1 }}>{board.boardName}</Typography>
+                        <Link to={`${encodeURIComponent(board.boardName)}/${board.id}`}>
+                        <EditIcon sx={{ marginRight: '30px', color:'grey' }}/></Link>
+                        <DeleteIcon onClick={() => handleDeleteBoard(board.id)} sx={{ marginRight: '20px', color:'grey' }}  />
+                    </Box>
+                ))}
+                <Button variant="outlined" size="large" onClick={handleCreateBoardPopup}> Create New Board </Button>
+                {isCreateBoardPopupOpen && <CreateBoardPopup closeCreateBoardPopup={handleCreateBoardPopup} imageData={imageData} userId={user?.uid} />}
             </Box>
         </>
     );
