@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SignIn from './Pages/SignIn';
 import Home from './Pages/Home';
 import BoardPage from './Pages/BoardPage'
-
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../services/AuthContext';
-import { AppBar, Box, Toolbar, Typography, Button, Avatar} from '@mui/material';
+import { AppBar, Box, Toolbar, Typography, Button, Avatar, IconButton } from '@mui/material';
 import { AccountCircleOutlined as AccountCircleOutlinedIcon } from '@mui/icons-material';
 import MyApp from '../services/title';
 import TrelloIcon from '../assets/trello-icon.svg';
@@ -8,7 +8,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import CreateBoardPopup from '../Components/CreateBoardPopup';
 import { getImagesFromStorage } from '../services/firebaseStorage'
 import { getBoards, deleteBoard } from '../services/firestoreService'
-import { DeleteForeverTwoTone as DeleteIcon, ModeEdit as EditIcon} from '@mui/icons-material';
+import { Delete as DeleteIcon, ModeEdit as EditIcon } from '@mui/icons-material';
 import { BoardsSkeleton } from '../Components/Skeleton';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -58,7 +58,7 @@ const Home = () => {
     return (
         <>
             <MyApp dynamicTitle='Home' />
-            <ToastContainer/>
+            <ToastContainer />
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
                     <Toolbar sx={{ justifyContent: 'space-between' }}>
@@ -79,29 +79,32 @@ const Home = () => {
             </Box>
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography sx={{ fontSize: '2rem', fontWeight: '900', margin: '1rem 5rem' }}>Your Boards</Typography>
-                {boards.length === 0?
-                <BoardsSkeleton/>
-                :boards?.map((board) => (
+                {boards.length === 0 ?
+                    <BoardsSkeleton />
+                    : boards?.map((board) => (
 
-                    <Box key={board.id}
-                        sx={{
-                            border: '1px solid #ccc',
-                            borderRadius: '8px',
-                            padding: '10px 20px',
-                            marginBottom: '10px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            width: '50%',
-                            marginX: '5rem'
-                        }}
-                    >
-                        <Typography sx={{ flexGrow: 1 }}>{board.boardName}</Typography>
-                        <Link to={`${encodeURIComponent(board.boardName)}/${board.id}`}>
-                        <EditIcon sx={{ marginRight: '30px', color:'grey' }}/></Link>
-                        <DeleteIcon onClick={() => handleDeleteBoard(board.id)} sx={{ marginRight: '20px', color:'grey' }}  />
-                    </Box>
-                ))}
+                        <Box key={board.id}
+                            sx={{
+                                border: '1px solid #ccc',
+                                borderRadius: '8px',
+                                padding: '10px 20px',
+                                marginBottom: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                width: '50%',
+                                marginX: '5rem'
+                            }}
+                        >
+                            <Typography sx={{ flexGrow: 1 }}>{board.boardName}</Typography>
+                            <Link to={`${encodeURIComponent(board.boardName)}/${board.id}`}>
+                                <IconButton sx={{ marginRight: '30px', color: 'grey' }} > <EditIcon/></IconButton></Link>
+                            <IconButton aria-label="delete" sx={{ marginRight: '20px', color: 'grey' }}>
+                                <DeleteIcon onClick={() => handleDeleteBoard(board.id)} />
+                            </IconButton>
+                        </Box>
+
+                    ))}
                 <Button variant="outlined" size="large" onClick={handleCreateBoardPopup}> Create New Board </Button>
                 {isCreateBoardPopupOpen && <CreateBoardPopup closeCreateBoardPopup={handleCreateBoardPopup} imageData={imageData} userId={user?.uid} />}
             </Box>

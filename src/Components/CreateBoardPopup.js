@@ -84,10 +84,10 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
         >
           <TextField error={textError !== ''} helperText={textError !== '' ? 'Board name cannot be empty' : ''}
             id="outlined-error" value={boardName} onChange={handleBoardNameChange} label="Enter Board  Name here ..." variant="outlined" sx={{ width: '30rem', marginTop: '5rem' }} />
+          <span style={{margin:'10px', color:'grey'}}>Select Board Background</span>
           <ImageList sx={{ width: 450, height: 300, marginTop: '10px' }} cols={4} rowHeight={100} rows={3}>
             {imageData.map((item, index) => (
               <ImageListItem key={index}>
-
                 <img
                   src={item}
                   alt={item}
@@ -96,6 +96,7 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
               </ImageListItem>
             ))}
           </ImageList>
+          <span style={{margin:'5px', color:'grey'}}>Board Background</span>
           <img
             src={selectedImage}
             alt="selected image"
