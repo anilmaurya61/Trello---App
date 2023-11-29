@@ -89,6 +89,11 @@ export default function PersistentDrawerLeft() {
     const [imageData, setImageData] = useState([]);
     const { user, signOut } = useAuth();
     const navigate = useNavigate();
+    const [listsCount, setListsCount] = useState(1);
+
+    const handleListClick = () => {
+        setListsCount(prevCount => prevCount + 1);
+    };
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -130,6 +135,7 @@ export default function PersistentDrawerLeft() {
             toast.error("Error Deleting Board. Please try again.");
         }
     }
+
     return (
         <>
             <MyApp dynamicTitle={boardName} />
@@ -221,12 +227,11 @@ export default function PersistentDrawerLeft() {
                     width: '100%',
                     height: '100%',
                 }}>
-                    <DrawerHeader/>
-                    <Box sx={{display:'flex', gap:'1rem'}}>
-                        <Lists />
-                        <Lists />
-                        <Lists />
-                        <Lists />
+                    <DrawerHeader />
+                    <Box sx={{ display: 'flex', gap: '1rem' }}>
+                        {[...Array(listsCount)].map((_, index) => (
+                            <Lists key={index} onClick={handleListClick} />
+                        ))}
                     </Box>
                 </Main>
             </Box>
