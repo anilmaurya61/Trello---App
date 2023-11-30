@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Button, TextField, Box, Typography, IconButton } from '@mui/material';
 import { AddOutlined as AddIcon, Close as CloseIcon } from '@mui/icons-material';
 import CardDetails from "./CardDetails";
+import {createCard} from '../services/firestoreService'
+import { useParams } from "react-router-dom";
 
 
 export default function Cards({ listTitle }) {
@@ -10,6 +12,7 @@ export default function Cards({ listTitle }) {
     const [cards, setCards] = useState([]);
     const [cardTitle, setCardTitle] = useState('');
     const [cardDetailsState, setCardDetailsState] = useState(false);
+    const {boardId} = useParams();
 
     const handleCardTitleChange = (event) => {
         setCardTitle(event.target.value);
@@ -21,12 +24,13 @@ export default function Cards({ listTitle }) {
         setCardDetailsState(!cardDetailsState)
     }
 
-    const handleAddCard = () => {
+    const handleAddCard = async() => {
         if (cardTitle !== '') {
             const updatedCards = [...cards];
             updatedCards.push(cardTitle);
             setCards(updatedCards);
             setCardTitle('');
+            await createCard({'cardTitle': cardTitle, 'boardId': boardId});
         }
     }
 

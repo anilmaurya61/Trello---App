@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import Cards from './Cards';
+import Cards from '../Cards';
 import AddTodoList from './AddTodoList';
 
 
-const TodoList = ({onClick}) => {
+const TodoList = () => {
   const [showCard, setShowCard] = useState(false);
   const [listTitle, setListTitle] = useState('');
 
@@ -12,7 +12,7 @@ const TodoList = ({onClick}) => {
   return (
     <Box sx={{minWidth:'300px'}}>
       {!showCard ?
-        <AddTodoList onClick={onClick} setListTitle={setListTitle} setShowCard={setShowCard} />
+        <AddTodoList setListTitle={setListTitle} setShowCard={setShowCard} />
         :
         <Box sx={{display:'flex', gap:'1rem'}}>
           <Cards listTitle={listTitle} />

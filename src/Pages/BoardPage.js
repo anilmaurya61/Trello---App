@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { styled, useTheme, Button } from '@mui/material';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import MyApp from '../services/title';
 import Lists from '../Components/List';
 import UserInfo from '../Components/UserInfo';
 import { ToastContainer, toast } from 'react-toastify';
 import { getImagesFromStorage } from '../services/firebaseStorage'
-import { getBoards, deleteBoard } from '../services/firestoreService'
+import { getBoards, deleteBoard, getBoardsById } from '../services/firestoreService'
 import { useAuth } from '../services/AuthContext';
-
-
+import loaderGif from '../assets/loader.gif'
+import { getListsById } from '../services/firestoreService'
 
 import {
     Box,
@@ -23,9 +23,9 @@ import {
     IconButton,
     ListItemButton,
     ListItemIcon,
-    ListItemText,
     ListItem
 } from '@mui/material';
+
 import {
     Menu as MenuIcon,
     ChevronLeft as ChevronLeftIcon,
@@ -88,8 +88,9 @@ export default function PersistentDrawerLeft() {
     const [boards, setBoards] = useState([]);
     const [imageData, setImageData] = useState([]);
     const { user, signOut } = useAuth();
-    const navigate = useNavigate();
     const [listsCount, setListsCount] = useState(1);
+    const [currentBoard, setCurrentBoard] = useState(null);
+    const [currentBoardLists, setCurrentBoardLists] = useState([]);
 
     const handleListClick = () => {
         setListsCount(prevCount => prevCount + 1);
@@ -100,10 +101,6 @@ export default function PersistentDrawerLeft() {
     const handleDrawerClose = () => {
         setOpen(false);
     };
-
-    // const handleListItemClick = ( boardName, id ) => {
-    //     navigate.replace(`${encodeURIComponent(boardName)}/${id}`, { replace: true });
-    // };
 
     useEffect(() => {
         const fetchData = async (userId) => {
@@ -123,6 +120,18 @@ export default function PersistentDrawerLeft() {
         }
 
     }, [user]);
+
+    useEffect(() => {
+
+        const fetchBoard = async (boardId) => {
+            console.log(boardId);
+            let board = await getBoardsById(boardId);
+            setCurrentBoard(board)
+            let Lists = await getListsById(boardId);
+            setCurrentBoardLists(Lists)
+        }
+        fetchBoard(boardId)
+    }, [boardId])
 
     async function handleDeleteBoard(id) {
         try {
@@ -189,10 +198,10 @@ export default function PersistentDrawerLeft() {
                     <Divider />
                     <List sx={{ height: '78vh' }}>
                         <ListItem>Your boards</ListItem>
-                        {boards.map((board) => (
+                        {boards.length > 0 && boards.map((board) => (
                             <ListItem key={board.id} disablePadding >
                                 <ListItemButton sx={{ display: 'flex' }}>
-                                    <Link to={`${encodeURIComponent(board.boardName)}/${board.id}`} action="REPLACE" style={{ textDecoration: 'none' }}>
+                                    <Link to={`/home/${encodeURIComponent(board.boardName)}/${board.id}`} style={{ textDecoration: 'none' }}>
                                         <ListItemIcon>
                                             <img
                                                 src={board.backgroundImage}
@@ -219,8 +228,8 @@ export default function PersistentDrawerLeft() {
                     </Box>
 
                 </Drawer>
-                <Main open={open} sx={{
-                    backgroundImage: `url('https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg')`,
+                {currentBoard ? <Main open={open} sx={{
+                    backgroundImage: `url(${currentBoard[0]?.backgroundImage})`,
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'cover',
                     minHeight: '100vh',
@@ -228,12 +237,29 @@ export default function PersistentDrawerLeft() {
                     height: '100%',
                 }}>
                     <DrawerHeader />
-                    <Box sx={{ display: 'flex', gap: '1rem' }}>
+                    {/* <Box sx={{ display: 'flex', gap: '1rem' }}>
                         {[...Array(listsCount)].map((_, index) => (
                             <Lists key={index} onClick={handleListClick} />
                         ))}
-                    </Box>
+                    </Box> */}
+                   {currentBoardLists && <Box sx={{ display: 'flex', gap: '1rem' }}>
+                        {currentBoardLists.map((list, index) => (
+                            <Lists key={index} onClick={handleListClick} />
+                        ))}
+                    </Box>}
+
                 </Main>
+                    :
+                    <Main open={open} sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '100vh',
+                        minWidth: '100vw',
+                    }}>
+                        <img src={loaderGif}></img>
+                    </Main>
+                }
             </Box>
         </>
     );

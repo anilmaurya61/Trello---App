@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Button, TextField, Box, Card, CardContent, Typography, IconButton } from '@mui/material';
+import { Button, TextField, Box, IconButton } from '@mui/material';
 import { AddOutlined as AddIcon, Close as CloseIcon } from '@mui/icons-material';
 
 
-const AddList = ({onClick, setListTitle, setShowCard}) => {
+const AddList = ({handleCreateLists, onClick, setListTitle, setShowCard}) => {
   const [showButton, setShowButton] = useState(true);
 
   const handleAddButton = () => {
@@ -37,7 +37,7 @@ const AddList = ({onClick, setListTitle, setShowCard}) => {
       {!showButton && (
         <Box sx={{ backgroundColor: 'white', borderRadius: '10px', padding: '16px' }}>
           <TextField onChange={ handleListTitleChange } label="List title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
-          <Button onClick={handleAddList} variant="contained" sx={{ margin: '10px', width: '75%' }}>
+          <Button onClick={()=>{handleAddList(); handleCreateLists()}} variant="contained" sx={{ margin: '10px', width: '75%' }}>
             Add List
           </Button>
           <IconButton onClick={handleAddButton}>

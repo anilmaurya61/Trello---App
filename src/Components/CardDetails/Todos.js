@@ -9,7 +9,6 @@ export default function Todos({ listTitle }) {
     const [addaCard, setAddaCard] = useState(true);
     const [cards, setCards] = useState([]);
     const [cardTitle, setCardTitle] = useState('');
-    const [cardDetailsState, setCardDetailsState] = useState(false);
 
     const handleCardTitleChange = (event) => {
         setCardTitle(event.target.value);
@@ -49,7 +48,7 @@ export default function Todos({ listTitle }) {
                 }
                 {addaCard ?
                     <Button onClick={handleAddaCard} variant="outlined" startIcon={<AddIcon />} sx={{ margin: '10px', width: '75%' }}>
-                        Add a card
+                        Add a Todo
                     </Button>
                     : <Box sx={{
                         width: '250px',
@@ -61,7 +60,7 @@ export default function Todos({ listTitle }) {
                     }}>
                         <TextField value={cardTitle} onChange={handleCardTitleChange} label="Card title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
                         <Button onClick={handleAddCard} variant="outlined" sx={{ margin: '10px', width: '65%' }}>
-                            Add Card
+                            Add Todo
                         </Button>
                         <IconButton onClick={handleAddaCard}>
                             <CloseIcon />

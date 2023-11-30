@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, IconButton, TextField } from '@mui/material'
 import { Cancel as CancelIcon } from '@mui/icons-material';
-import TodoList from './TodoList'
+import TodoList from './CardDetails/TodoList'
 
 const CardDetails = () => {
     return (
