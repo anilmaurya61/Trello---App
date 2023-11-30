@@ -13,17 +13,21 @@ export default function Cards2({ listData }) {
     const [cardTitle, setCardTitle] = useState('');
     const [cardDetailsState, setCardDetailsState] = useState(false);
     const [cardDetailsData, setCardDetaisData] = useState({});
+    const [edit, setEdit] = useState(false);
     const { boardId } = useParams();
 
-
+    const handleEditCard = ({ cardId }) => {
+        console.log(cardId);
+        setEdit(!edit)
+    }
     const handleCardTitleChange = (event) => {
         setCardTitle(event.target.value);
     }
     const handleAddaCard = () => {
         setAddaCard(!addaCard)
     }
-    const handleCardDetailsState = ({cardTitle, cardId}) => {
-        setCardDetaisData({boardId,cardTitle, cardId})
+    const handleCardDetailsState = ({ cardTitle, cardId }) => {
+        setCardDetaisData({ boardId, cardTitle, cardId })
         setCardDetailsState(!cardDetailsState)
     }
 
@@ -41,7 +45,7 @@ export default function Cards2({ listData }) {
         await deleteList({ 'boardId': boardId, 'listId': listData.id })
     }
     const handleCardDelete = async (id) => {
-        let cardsData = cards.filter(c=>c.cardId == id);
+        let cardsData = cards.filter(c => c.cardId == id);
         setCards(cardsData)
         await deleteCard({ 'boardId': boardId, 'listId': listData.id, 'cardId': id })
     };
@@ -72,15 +76,18 @@ export default function Cards2({ listData }) {
                                 justifyContent: 'space-between',
                             }}
                         >
-                            <Typography onClick={()=>handleCardDetailsState({ 'cardTitle':card.cardTitle,'cardId':card.cardId })} variant="h6">{card.cardTitle}</Typography>
+
+                            <Typography onClick={() => handleCardDetailsState({ 'cardTitle': card.cardTitle, 'cardId': card.cardId })} variant="h6">{card.cardTitle}</Typography>
                             <Box>
-                                <IconButton aria-label="edit">
+                                <IconButton aria-label="edit" onClick={() => handleEditCard(card.cardId)}>
                                     <EditIcon />
                                 </IconButton>
                                 <IconButton aria-label="delete" onClick={() => handleCardDelete(card.cardId)}>
-                                    <DeleteIcon  />
+                                    <DeleteIcon />
                                 </IconButton>
                             </Box>
+
+
                         </Box>
                     )
                 })
@@ -108,7 +115,7 @@ export default function Cards2({ listData }) {
                 }
 
             </Box>
-            {cardDetailsState && <CardDetails setCardDetailsState={handleCardDetailsState} cardDetailsData = {cardDetailsData}/>}
+            {cardDetailsState && <CardDetails setCardDetailsState={handleCardDetailsState} cardDetailsData={cardDetailsData} />}
         </>
     );
 }

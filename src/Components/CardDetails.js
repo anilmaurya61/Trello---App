@@ -1,9 +1,21 @@
-import React from 'react'
-import { Box, IconButton, TextField } from '@mui/material'
+import React, { useState } from 'react'
+import { Box, Button, IconButton, TextField, Typography } from '@mui/material'
 import { Cancel as CancelIcon } from '@mui/icons-material';
 import TodoList from './CardDetails/TodoList'
 
-const CardDetails = ({cardDetailsData, setCardDetailsState}) => {
+const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
+
+    const [comments, setComments] = useState([]);
+    const [comment, setComment] = useState('');
+
+    const handleCommentChange = (event) => {
+        setComment(event.target.value);
+    }
+    const handleComment = () =>{
+        console.log(comment)
+        setComments([...comments, comment]); 
+    }
+    
     return (
         <>
             <Box
@@ -34,14 +46,24 @@ const CardDetails = ({cardDetailsData, setCardDetailsState}) => {
                     <IconButton onClick={setCardDetailsState} aria-label="cancel" size="large" sx={{ position: 'absolute', top: '0.5rem', right: '0.5rem' }}>
                         <CancelIcon />
                     </IconButton>
-                    <h1 style={{margin:'1rem'}}>{cardDetailsData.cardTitle}</h1>
-                    <TodoList/>
-                    <TextField
-                        id="outlined-basic"
-                        label="Write a Comment ..."
-                        variant="outlined"
-                        sx={{ width: '70%', marginLeft: '5rem' }}
-                    />
+                    <h1 style={{ margin: '1rem 15%' }}>{cardDetailsData.cardTitle}</h1>
+                    <TodoList />
+                    <Box sx={{ width: '70%', margin: '3rem 15%' }}>
+                        <TextField
+                            id="outlined-basic"
+                            label="Write a Comment ..."
+                            variant="outlined"
+                            sx={{ width: '100%', margin: '0.5rem 0' }}
+                            value={comment}
+                            onChange={handleCommentChange}
+                        />
+                        <Button variant='contained' onClick={handleComment}>Save</Button>
+                    </Box>
+                    <Box sx={{ width: '70%', margin: '3rem 15%' }}>
+                        {comments.map((comment,index)=>(
+                            <Typography key={index}>{comment}</Typography>
+                        ))}
+                    </Box>
                 </Box>
             </Box>
         </>
