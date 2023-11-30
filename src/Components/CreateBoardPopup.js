@@ -14,9 +14,6 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
   const [textError, setTextError] = useState('');
   const navigate = useNavigate();
 
-
-
-
   const handleCreateBoard = async () => {
     try {
       if (boardName.length > 0) {

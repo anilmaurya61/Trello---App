@@ -3,7 +3,7 @@ import { Box, IconButton, TextField } from '@mui/material'
 import { Cancel as CancelIcon } from '@mui/icons-material';
 import TodoList from './CardDetails/TodoList'
 
-const CardDetails = () => {
+const CardDetails = ({cardDetailsData, setCardDetailsState}) => {
     return (
         <>
             <Box
@@ -24,18 +24,17 @@ const CardDetails = () => {
                     sx={{
                         height: '70%',
                         width: '60%',
-                        background: 'white',
+                        background: '#ebecf0',
                         position: 'absolute',
                         top: '15%',
                         boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.3)',
                         borderRadius: '10px',
                     }}
                 >
-                    <IconButton aria-label="cancel" size="large" sx={{ position: 'absolute', top: '0.5rem', right: '0.5rem' }}>
+                    <IconButton onClick={setCardDetailsState} aria-label="cancel" size="large" sx={{ position: 'absolute', top: '0.5rem', right: '0.5rem' }}>
                         <CancelIcon />
                     </IconButton>
-
-                    <h1>Hii this is Card Details</h1>
+                    <h1 style={{margin:'1rem'}}>{cardDetailsData.cardTitle}</h1>
                     <TodoList/>
                     <TextField
                         id="outlined-basic"

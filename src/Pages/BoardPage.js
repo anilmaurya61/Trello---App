@@ -10,6 +10,7 @@ import { getBoards, deleteBoard, getBoardsById } from '../services/firestoreServ
 import { useAuth } from '../services/AuthContext';
 import loaderGif from '../assets/loader.gif'
 import { getListsById } from '../services/firestoreService'
+import Cards2 from '../Components/Cards2';
 
 import {
     Box,
@@ -114,7 +115,6 @@ export default function PersistentDrawerLeft() {
                 toast.error("Error loading data. Please try again.");
             }
         };
-        console.log(user)
         if (user) {
             fetchData(user?.uid);
         }
@@ -122,9 +122,7 @@ export default function PersistentDrawerLeft() {
     }, [user]);
 
     useEffect(() => {
-
         const fetchBoard = async (boardId) => {
-            console.log(boardId);
             let board = await getBoardsById(boardId);
             setCurrentBoard(board)
             let Lists = await getListsById(boardId);
@@ -132,6 +130,7 @@ export default function PersistentDrawerLeft() {
         }
         fetchBoard(boardId)
     }, [boardId])
+
 
     async function handleDeleteBoard(id) {
         try {
@@ -144,6 +143,7 @@ export default function PersistentDrawerLeft() {
             toast.error("Error Deleting Board. Please try again.");
         }
     }
+
 
     return (
         <>
@@ -217,7 +217,6 @@ export default function PersistentDrawerLeft() {
                                 </IconButton>
                             </ListItem>
                         ))}
-
                     </List>
                     <Divider />
                     <Box sx={{ width: '150px', margin: '1rem auto 0rem auto' }}>
@@ -237,17 +236,17 @@ export default function PersistentDrawerLeft() {
                     height: '100%',
                 }}>
                     <DrawerHeader />
-                    {/* <Box sx={{ display: 'flex', gap: '1rem' }}>
-                        {[...Array(listsCount)].map((_, index) => (
-                            <Lists key={index} onClick={handleListClick} />
-                        ))}
-                    </Box> */}
-                   {currentBoardLists && <Box sx={{ display: 'flex', gap: '1rem' }}>
-                        {currentBoardLists.map((list, index) => (
-                            <Lists key={index} onClick={handleListClick} />
-                        ))}
-                    </Box>}
-
+                    <Box sx={{ display: 'flex', gap: '1rem' }}>
+                    {currentBoardLists?.allLists &&
+                        <Box sx={{ display: 'flex', gap: '1rem' }}>
+                            {currentBoardLists.allLists.map((list, index) => (
+                                <Cards2 key={index} listData={list} />
+                            ))}
+                            
+                        </Box>
+                    }
+                        <Lists/>
+                    </Box>
                 </Main>
                     :
                     <Main open={open} sx={{

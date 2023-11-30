@@ -32,7 +32,7 @@ export default function Todos({ listTitle }) {
             <Box sx={{ width: '300px', backgroundColor: 'white', borderRadius: '10px', padding: '16px' }}>
                 <Typography variant="h6">{listTitle}</Typography>
                 {cards.length > 0 && cards.map((card, index) => (
-                    <Box key={index} onClick={handleCardDetailsState}
+                    <Box key={index}
                         sx={{
                             width: '250px',
                             backgroundColor: 'white',

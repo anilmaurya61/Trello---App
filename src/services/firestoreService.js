@@ -1,4 +1,5 @@
 import { getFirestore, collection, getDoc, updateDoc, doc, setDoc, query, where, getDocs, deleteDoc } from "firebase/firestore";
+
 import app from './firebaseConfig'
 
 const getId = () => {
@@ -38,6 +39,7 @@ const getBoards = async (userId) => {
     throw e;
   }
 }
+
 const getBoardsById = async (boardId) => {
   try {
     const q = await query(collection(db, "boards"), where("id", "==", boardId));
@@ -56,20 +58,23 @@ const getBoardsById = async (boardId) => {
 }
 
 const getListsById = async (id) => {
+
   try {
-    const q = await query(collection(db, "Lists"));
+    const docRef = doc(db, "Lists", id);
 
-    const querySnapshot = await getDocs(q);
+    const docSnapshot = await getDoc(docRef);
 
-    const lists = querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-    }));
-    return lists;
-  }
-  catch (e) {
+    if (docSnapshot.exists()) {
+
+      return { ...docSnapshot.data() };
+    } else {
+      return null;
+    }
+  } catch (e) {
     throw e;
   }
-}
+};
+
 
 const deleteBoard = async (id) => {
   try {
@@ -81,11 +86,41 @@ const deleteBoard = async (id) => {
   }
 };
 
+const deleteList = async ({ boardId, listId }) => {
+  try {
+
+    const listsRef = collection(db, 'Lists');
+
+    const listDocRef = doc(listsRef, boardId);
+
+    const listDoc = await getDoc(listDocRef);
+
+    const currentData = listDoc.exists() ? listDoc.data() : { allLists: [] };
+
+    const updatedLists = currentData.allLists.filter(listData => listData.id !== listId);
+
+    console.log(updatedLists);
+
+    if (listDoc.exists()) {
+      await updateDoc(listDocRef, { allLists: updatedLists });
+    } else {
+      await setDoc(listDocRef, { allLists: updatedLists });
+    }
+
+    console.log('List Deleted for board with ID: ', listId);
+
+  } catch (e) {
+    console.error('Error Deleting list: ', e);
+    throw e;
+  }
+}
+
+
 const createLists = async (listData) => {
   try {
     const id = getId();
+
     listData = { ...listData, 'id': id }
-    console.log(listData);
 
     const listsRef = collection(db, 'Lists');
 
@@ -93,11 +128,10 @@ const createLists = async (listData) => {
 
     const listDoc = await getDoc(listDocRef);
 
-    const currentData = listDoc.exists() ? listDoc.data() : { Lists: [] };
+    const currentData = listDoc.exists() ? listDoc.data() : { allLists: [] };
 
-    console.log(currentData)
     const updatedData = {
-      Lists: [...currentData.Lists, listData],
+      allLists: [...currentData.allLists, listData],
     };
 
     if (listDoc.exists()) {
@@ -120,16 +154,15 @@ const createCard = async (cardData) => {
     const id = getId();
     cardData = { ...cardData, 'cardId': id };
 
-    const listsRef = collection(db, 'Lists')
+    const docRef = doc(db, "Lists", cardData.boardId);
 
-    const listDocRef = doc(listsRef, cardData.boardId);
+    const docSnapshot = await getDoc(docRef);
 
-    const listDoc = await getDoc(listDocRef);
+    if (docSnapshot.exists()) {
 
-    if (listDoc.exists()) {
-      const currentData = listDoc.data();
-      const updatedLists = currentData.Lists.map((list) => {
-        if (list.ListId === cardData.listId) {
+      let data = { ...docSnapshot.data() };
+      const updatedLists = data.allLists.map((list) => {
+        if (list.id === cardData.listId) {
           return {
             ...list,
             Cards: [...(list.Cards || []), cardData],
@@ -138,10 +171,9 @@ const createCard = async (cardData) => {
         return list;
       });
 
-      await updateDoc(listDocRef, { Lists: updatedLists });
+      await updateDoc(docRef, { allLists: updatedLists });
 
       console.log('Card created for list with ID: ', cardData);
-      return cardData.cardId;
     } else {
       console.error('List with ID does not exist: ', cardData.listId);
       return null;
@@ -292,19 +324,26 @@ const addComments = async (commentData) => {
   }
 };
 
-const deleteCard = async (listId, cardId) => {
+const deleteCard = async ({boardId, listId, cardId}) => {
+  console.log(boardId, listId, cardId)
   try {
     const listsRef = collection(db, 'Lists');
-    const listDocRef = doc(listsRef, listId);
+
+    const listDocRef = doc(listsRef, boardId);
 
     const listDoc = await getDoc(listDocRef);
 
     if (listDoc.exists()) {
       const currentData = listDoc.data();
-      const updatedLists = currentData.Lists.map((list) => {
-        if (list.ListId === listId) {
-          const updatedCards = list.Cards.filter((card) => card.cardId !== cardId);
 
+      console.log(currentData);
+
+      const updatedLists = currentData.allLists.map((list) => {
+        console.log(list);
+        if (list.id == listId) {
+          console.log("a",list.Cards)
+          const updatedCards = list.Cards.filter((card) => card.cardId != cardId);
+          console.log("bb",updatedCards)
           return {
             ...list,
             Cards: updatedCards,
@@ -313,13 +352,10 @@ const deleteCard = async (listId, cardId) => {
         return list;
       });
 
-      await updateDoc(listDocRef, { Lists: updatedLists });
+      await updateDoc(listDocRef, { allLists: updatedLists });
 
       console.log('Card deleted with ID: ', cardId);
-      return true;
-    } else {
-      console.error('List with ID does not exist: ', listId);
-      return false;
+     
     }
   } catch (e) {
     console.error('Error deleting card: ', e);
@@ -376,6 +412,8 @@ export {
   createBoard,
   getBoards,
   deleteBoard,
+  deleteList,
+  deleteCard,
   getBoardsById,
   createLists,
   createCard,

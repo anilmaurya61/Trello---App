@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import Cards from '../Cards';
-import AddTodoList from './AddTodoList';
+import Todos from './Todos';
 
 
 const TodoList = () => {
@@ -10,14 +9,10 @@ const TodoList = () => {
 
 
   return (
-    <Box sx={{minWidth:'300px'}}>
-      {!showCard ?
-        <AddTodoList setListTitle={setListTitle} setShowCard={setShowCard} />
-        :
-        <Box sx={{display:'flex', gap:'1rem'}}>
-          <Cards listTitle={listTitle} />
-        </Box>
-      }
+    <Box sx={{ minWidth: '300px' }}>
+      <Box sx={{ display: 'flex', gap: '1rem' }}>
+        <Todos listTitle={listTitle} />
+      </Box>
     </Box>
   );
 };

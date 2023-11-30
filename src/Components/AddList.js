@@ -3,7 +3,7 @@ import { Button, TextField, Box, IconButton } from '@mui/material';
 import { AddOutlined as AddIcon, Close as CloseIcon } from '@mui/icons-material';
 
 
-const AddList = ({handleCreateLists, onClick, setListTitle, setShowCard}) => {
+const AddList = ({handleCreateLists, setListTitle, setShowCard}) => {
   const [showButton, setShowButton] = useState(true);
 
   const handleAddButton = () => {
@@ -20,21 +20,20 @@ const AddList = ({handleCreateLists, onClick, setListTitle, setShowCard}) => {
 
   return (
     <Box width='300px'>
-      {showButton &&  (
+      {showButton ?  (
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => {
             handleAddButton();
-            onClick(); 
           }}        
           sx={{ width: '300px', justifyContent: 'flex-start', textAlign: 'left' }}
         >
           Add A List
         </Button>
-      )}
-
-      {!showButton && (
+      )
+      :
+      (
         <Box sx={{ backgroundColor: 'white', borderRadius: '10px', padding: '16px' }}>
           <TextField onChange={ handleListTitleChange } label="List title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
           <Button onClick={()=>{handleAddList(); handleCreateLists()}} variant="contained" sx={{ margin: '10px', width: '75%' }}>
