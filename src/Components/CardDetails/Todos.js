@@ -1,116 +1,178 @@
-import React, { useState } from "react";
-import { Button, TextField, Box, Typography, IconButton, FormControlLabel, Switch } from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { Button, TextField, Box, Typography, IconButton, Checkbox } from '@mui/material';
 import { AddOutlined as AddIcon, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+import { addTodo, getTodo, deleteTodo, updateTodo } from '../../services/firestoreService'
+
+export default function Todos({ cardInfo }) {
+    const [addaTodo, setAddaTodo] = useState(true);
+    const [todos, setTodos] = useState([]);
+    const [todo, setTodo] = useState('');
+    const [isEdit, setIsEdit] = useState(false);
+    const [updatedTodo, setUpdatedTodo] = useState('');
+    const [todoId, setTodoId] = useState('');
 
 
-export default function Todos({ listTitle }) {
+    const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
-    const [addaCard, setAddaCard] = useState(true);
-    const [cards, setCards] = useState([]);
-    const [cardTitle, setCardTitle] = useState('');
+    useEffect(() => {
+        const fetchTodo = async () => {
+            try {
+                let todos = await getTodo({
+                    boardId: cardInfo.boardId,
+                    listId: cardInfo.listId,
+                    cardId: cardInfo.cardId,
+                });
+                setTodos(todos)
+            } catch (error) {
+                console.error('Error fetching todo:', error);
+            }
+        };
 
-    const handleCardTitleChange = (event) => {
-        setCardTitle(event.target.value);
+        fetchTodo();
+    }, []);
+    const handleEditTodo = (todoId) =>{
+        setIsEdit(true);
+        setTodoId(todoId);
     }
-    const handleAddaCard = () => {
-        setAddaCard(!addaCard)
+    const handleEditTodoTitle = (event) =>{
+        setUpdatedTodo(event.target.value);
     }
 
-    const handleAddCard = () => {
-        if (cardTitle !== '') {
-            const updatedCards = [...cards];
-            updatedCards.push(cardTitle);
-            setCards(updatedCards);
-            setCardTitle('');
+    const handleTodoTitleChange = (event) => {
+        setTodo(event.target.value);
+    }
+    const handleAddaTodo = () => {
+        setAddaTodo(!addaTodo)
+    }
+
+    const handleAddTodo = async () => {
+        if (todo !== '') {
+            const updatedTodos = [{ 'todoTitle': todo }, ...todos];
+            setTodos(updatedTodos);
+            setTodo('');
         }
+        await addTodo({ 'todo': todo, 'boardId': cardInfo.boardId, 'listId': cardInfo.listId, 'cardId': cardInfo.cardId, 'isCompleted': false });
     }
 
+    const handletododelete = async (todoId) => {
+        await deleteTodo({ 'todoId': todoId, 'boardId': cardInfo.boardId, 'listId': cardInfo.listId, 'cardId': cardInfo.cardId })
+    }
 
-    const Android12Switch = styled(Switch)(({ theme }) => ({
-        padding: 8,
-        '& .MuiSwitch-track': {
-            borderRadius: 22 / 2,
-            '&:before, &:after': {
-                content: '""',
-                position: 'absolute',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 16,
-                height: 16,
-            },
-            '&:before': {
-                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
-                    theme.palette.getContrastText(theme.palette.primary.main),
-                )}" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>')`,
-                left: 12,
-            },
-            '&:after': {
-                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
-                    theme.palette.getContrastText(theme.palette.primary.main),
-                )}" d="M19,13H5V11H19V13Z" /></svg>')`,
-                right: 12,
-            },
-        },
-        '& .MuiSwitch-thumb': {
-            boxShadow: 'none',
-            width: 16,
-            height: 16,
-            margin: 2,
-        },
-    }));
+    const handleIsCompletedTodo = async (todoId, isCompleted) => {
+        try {
+            const updatedTodoData = {
+                'isCompleted': !isCompleted,
+            };
+            setTodos((prevTodos) =>
+                prevTodos.map((prevTodo) =>
+                    prevTodo.id === todoId ? { ...prevTodo, isCompleted: !prevTodo.isCompleted } : prevTodo
+                )
+            );
+            await updateTodo(cardInfo.boardId, cardInfo.listId, cardInfo.cardId, todoId, updatedTodoData);
+
+        } catch (error) {
+            console.error('Error updating todo:', error);
+        }
+    };
+
+    const handleUpdateTodo = async () => {
+        try {
+
+
+            const updatedTodoData = {
+                'todoTitle': updatedTodo,
+            };
+            setTodos((prevTodos) =>
+                prevTodos.map((prevTodo) =>
+                    prevTodo.id === todoId ? { ...prevTodo, todoTitle: updatedTodo } : prevTodo
+                )
+            );
+            setIsEdit(false);
+            await updateTodo(cardInfo.boardId, cardInfo.listId, cardInfo.cardId, todoId, updatedTodoData);
+
+        } catch (error) {
+            console.error('Error updating todo:', error);
+        }
+    };
 
     return (
         <>
             <Box sx={{ margin: '0 auto', width: '70%', backgroundColor: 'white', borderRadius: '10px', padding: '16px' }}>
-                <Typography variant="h6">{listTitle}</Typography>
-                {cards.length > 0 && cards.map((card, index) => (
-                    <Box key={index}
-                        sx={{
-                            width: '70%',
-                            backgroundColor: 'white',
-                            borderRadius: '10px',
-                            padding: '10px',
-                            margin: '10px',
-                            boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
-                        }}
-                    >
-                        <Typography variant="h6">{card}</Typography>
-                        <Box>
-                            <FormControlLabel
-                                control={<Android12Switch defaultChecked />}
-                                label="isCompleted"
-                            />
-                            <IconButton aria-label="edit">
-                                <EditIcon />
-                            </IconButton>
-                            <IconButton aria-label="delete">
-                                <DeleteIcon />
-                            </IconButton>
-                        </Box>
-                    </Box>
-                ))
-                }
-                {addaCard ?
-                    <Button onClick={handleAddaCard} variant="outlined" startIcon={<AddIcon />} sx={{ margin: '10px', width: '75%' }}>
+
+                {addaTodo ?
+                    <Button onClick={handleAddaTodo} variant="outlined" startIcon={<AddIcon />} sx={{ margin: '10px', width: '75%' }}>
                         Add a Todo
                     </Button>
                     : <Box sx={{
-                        width: '70%',
+                        width: '100%',
                         backgroundColor: 'white',
                         borderRadius: '10px',
                         padding: '10px',
                         margin: '5px',
                         boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}>
-                        <TextField value={cardTitle} onChange={handleCardTitleChange} label="Card title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
-                        <Button onClick={handleAddCard} variant="outlined" sx={{ margin: '10px', width: '65%' }}>
-                            Add Todo
+                        <TextField value={todo} onChange={handleTodoTitleChange} label="Todo title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
+                        <Button onClick={handleAddTodo} variant="contained" sx={{ margin: '10px', width: '5rem' }}>
+                            Save
                         </Button>
-                        <IconButton onClick={handleAddaCard}>
+                        <IconButton onClick={handleAddaTodo}>
                             <CloseIcon />
                         </IconButton>
                     </Box>
+                }
+                {isEdit && <Box sx={{
+                        width: '100%',
+                        backgroundColor: 'white',
+                        borderRadius: '10px',
+                        padding: '10px',
+                        margin: '5px',
+                        boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        <TextField value={updatedTodo} onChange={handleEditTodoTitle} label="Todo title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
+                        <Button onClick={handleUpdateTodo} variant="contained" sx={{ margin: '10px', width: '5rem' }}>
+                            Save
+                        </Button>
+                        <IconButton onClick={handleAddaTodo}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>}
+                {todos.length > 0 && <Typography variant="h6">Todos</Typography>}
+                {todos.length > 0 && todos.map((todo, index) => (
+                    <Box key={index}
+                        sx={{
+                            width: '100%',
+                            backgroundColor: 'white',
+                            borderRadius: '10px',
+                            padding: '10px',
+                            margin: '10px',
+                            boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <Typography variant="h6">{todo.todoTitle}</Typography>
+                        <Box sx={{display:'flex', gap:'1rem'}}>
+                            <Checkbox
+                                {...label}
+                                checked={todo.isCompleted}
+                                onChange={() => handleIsCompletedTodo(todo.id, todo.isCompleted)}
+                            />
+                            <IconButton aria-label="edit" onClick={() => handleEditTodo(todo.id)}>
+                                <EditIcon />
+                            </IconButton>
+                            <IconButton onClick={() => handletododelete(todo.id)} aria-label="delete">
+                                <DeleteIcon />
+                            </IconButton>
+                        </Box>
+                    </Box>
+                ))
                 }
             </Box>
         </>

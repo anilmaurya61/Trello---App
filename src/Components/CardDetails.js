@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Button, IconButton, TextField, Typography } from '@mui/material'
 import { Cancel as CancelIcon } from '@mui/icons-material';
-import TodoList from './CardDetails/TodoList'
+import Todos from './CardDetails/Todos'
+import { addComments, getComments } from '../services/firestoreService';
 
 const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
 
@@ -11,11 +12,32 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
     const handleCommentChange = (event) => {
         setComment(event.target.value);
     }
-    const handleComment = () =>{
-        console.log(comment)
-        setComments([...comments, comment]); 
+    const handleComment = async () => {
+        setComments([comment, ...comments]);
+        await addComments({
+            'boardId': cardDetailsData.boardId,
+            'listId': cardDetailsData.listData.id,
+            'cardId': cardDetailsData.cardId,
+            'comment': comment
+        })
     }
-    
+    useEffect(() => {
+        const fetchComments = async ({ boardId, listId, cardId }) => {
+            try {
+                const comments = await getComments({ boardId, listId, cardId });
+                let revComment = comments.reverse();
+                setComments(revComment);
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+            }
+        };
+        fetchComments({
+            boardId: cardDetailsData.boardId,
+            listId: cardDetailsData.listData.id,
+            cardId: cardDetailsData.cardId,
+        });
+    }, [cardDetailsData]);
+
     return (
         <>
             <Box
@@ -24,7 +46,7 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
                     top: 0,
                     left: 0,
                     width: '100%',
-                    height: '100%',
+                    minHeight: '100%',
                     backdropFilter: 'blur(0.7px)',
                     zIndex: 1,
                     display: 'flex',
@@ -34,7 +56,7 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
             >
                 <Box
                     sx={{
-                        height: '70%',
+                        minHeight: '70%',
                         width: '60%',
                         background: '#ebecf0',
                         position: 'absolute',
@@ -47,7 +69,7 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
                         <CancelIcon />
                     </IconButton>
                     <h1 style={{ margin: '1rem 15%' }}>{cardDetailsData.cardTitle}</h1>
-                    <TodoList />
+                    <Todos cardInfo={cardDetailsData} />
                     <Box sx={{ width: '70%', margin: '3rem 15%' }}>
                         <TextField
                             id="outlined-basic"
@@ -59,10 +81,26 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
                         />
                         <Button variant='contained' onClick={handleComment}>Save</Button>
                     </Box>
-                    <Box sx={{ width: '70%', margin: '3rem 15%' }}>
-                        {comments.map((comment,index)=>(
-                            <Typography key={index}>{comment}</Typography>
-                        ))}
+                    <Box sx={{ width: '70%', margin: '3rem 15%', display: 'table' }}>
+                        <Typography>Comments</Typography>
+                        {comments.length > 0 ? comments.map((comment, index) => (
+                            <Typography
+                                key={index}
+                                sx={{
+                                    display: 'table-row',
+                                    backgroundColor: '#f5f5f5',
+                                    padding: '2rem',
+                                    marginBottom: '1rem',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                }}
+                            >
+                                {comment}
+                            </Typography>
+                        ))
+                            :
+                            <Typography sx={{ marginLeft: '0.5rem', color: 'grey' }}>No Comments Yet</Typography>
+                        }
                     </Box>
                 </Box>
             </Box>

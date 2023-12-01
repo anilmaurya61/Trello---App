@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, TextField, Box, Typography, IconButton } from '@mui/material';
 import { AddOutlined as AddIcon, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import CardDetails from "./CardDetails";
-import { createCard, deleteList, deleteCard } from '../services/firestoreService'
+import { createCard, deleteList, deleteCard, editCardTitle } from '../services/firestoreService'
 import { useParams } from "react-router-dom";
 
 
@@ -12,22 +12,49 @@ export default function Cards2({ listData }) {
     const [cards, setCards] = useState(listData?.Cards || []);
     const [cardTitle, setCardTitle] = useState('');
     const [cardDetailsState, setCardDetailsState] = useState(false);
-    const [cardDetailsData, setCardDetaisData] = useState({});
-    const [edit, setEdit] = useState(false);
+    const [cardDetailsData, setCardDetailsData] = useState({});
+    const [isEdit, setIsEdit] = useState(false);
     const { boardId } = useParams();
+    const [editedCardTitle, setEditedCard] = useState('');
+    const [cardId, setCardId] = useState('');
 
-    const handleEditCard = ({ cardId }) => {
-        console.log(cardId);
-        setEdit(!edit)
+    const handleCardEditTitleChange = (event) => {
+        setEditedCard(event.target.value)
     }
+
+    const handleEditCard = ({ cardId, cardTitle }) => {
+        setEditedCard(cardTitle)
+        setCardId(cardId);
+        setIsEdit(!isEdit)
+    }
+    const handleSaveCardEdit = async () => {
+        setIsEdit(!isEdit)
+        const updatedCards = cards.map((card) => {
+            if (card.cardId === cardId) {
+                return {
+                    ...card,
+                    cardTitle: editedCardTitle,
+                };
+            }
+            return card;
+        });
+
+        setCards(updatedCards);
+
+        await editCardTitle({ 'editedCardTitle': editedCardTitle, 'cardId': cardId, 'boardId': boardId, 'listId': listData.id });
+        setCardId('');
+        setEditedCard('');
+    }
+
     const handleCardTitleChange = (event) => {
         setCardTitle(event.target.value);
     }
     const handleAddaCard = () => {
         setAddaCard(!addaCard)
     }
+
     const handleCardDetailsState = ({ cardTitle, cardId }) => {
-        setCardDetaisData({ boardId, cardTitle, cardId })
+        setCardDetailsData({ boardId, cardTitle, cardId,'listId': listData.id, listData })
         setCardDetailsState(!cardDetailsState)
     }
 
@@ -59,14 +86,34 @@ export default function Cards2({ listData }) {
                         <CloseIcon />
                     </IconButton>
                 </Box>
+                {isEdit && <Box sx={{
+                    padding: '10px',
+                    margin: '10px'
+                }}>
+                    <TextField
+                        id="outlined-basic"
+                        label="Enter Card Name to Update ..."
+                        variant="outlined"
+                        style={{ marginBottom: '10px' }}
+                        value={editedCardTitle}
+                        onChange={handleCardEditTitleChange}
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={handleSaveCardEdit}
+                        style={{ backgroundColor: '#4CAF50', color: 'white' }}
+                    >
+                        Save
+                    </Button>
+                </Box>}
+
                 {cards && cards.map((card, index) => {
                     return (
-
                         <Box key={index}
-
                             sx={{
                                 width: '250px',
                                 backgroundColor: 'white',
+                                minHeight: '20px',
                                 borderRadius: '10px',
                                 padding: '10px',
                                 margin: '10px',
@@ -76,18 +123,15 @@ export default function Cards2({ listData }) {
                                 justifyContent: 'space-between',
                             }}
                         >
-
                             <Typography onClick={() => handleCardDetailsState({ 'cardTitle': card.cardTitle, 'cardId': card.cardId })} variant="h6">{card.cardTitle}</Typography>
                             <Box>
-                                <IconButton aria-label="edit" onClick={() => handleEditCard(card.cardId)}>
+                                <IconButton aria-label="edit" onClick={() => handleEditCard({ 'cardId': card.cardId, 'cardTitle': card.cardTitle })}>
                                     <EditIcon />
                                 </IconButton>
                                 <IconButton aria-label="delete" onClick={() => handleCardDelete(card.cardId)}>
                                     <DeleteIcon />
                                 </IconButton>
                             </Box>
-
-
                         </Box>
                     )
                 })
