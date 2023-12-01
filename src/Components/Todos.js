@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, TextField, Box, Typography, IconButton, Checkbox } from '@mui/material';
 import { AddOutlined as AddIcon, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { addTodo, getTodo, deleteTodo, updateTodo } from '../../services/firestoreService'
+import { addTodo, getTodo, deleteTodo, updateTodo } from '../services/firestoreService'
 
 export default function Todos({ cardInfo }) {
     const [addaTodo, setAddaTodo] = useState(true);
@@ -30,11 +30,11 @@ export default function Todos({ cardInfo }) {
 
         fetchTodo();
     }, []);
-    const handleEditTodo = (todoId) =>{
+    const handleEditTodo = (todoId) => {
         setIsEdit(true);
         setTodoId(todoId);
     }
-    const handleEditTodoTitle = (event) =>{
+    const handleEditTodoTitle = (event) => {
         setUpdatedTodo(event.target.value);
     }
 
@@ -124,56 +124,60 @@ export default function Todos({ cardInfo }) {
                     </Box>
                 }
                 {isEdit && <Box sx={{
-                        width: '100%',
-                        backgroundColor: 'white',
-                        borderRadius: '10px',
-                        padding: '10px',
-                        margin: '5px',
-                        boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}>
-                        <TextField value={updatedTodo} onChange={handleEditTodoTitle} label="Todo title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
-                        <Button onClick={handleUpdateTodo} variant="contained" sx={{ margin: '10px', width: '5rem' }}>
-                            Save
-                        </Button>
-                        <IconButton onClick={handleAddaTodo}>
-                            <CloseIcon />
-                        </IconButton>
-                    </Box>}
+                    width: '100%',
+                    backgroundColor: 'white',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    margin: '5px',
+                    boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <TextField value={updatedTodo} onChange={handleEditTodoTitle} label="Todo title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
+                    <Button onClick={handleUpdateTodo} variant="contained" sx={{ margin: '10px', width: '5rem' }}>
+                        Save
+                    </Button>
+                    <IconButton onClick={handleAddaTodo}>
+                        <CloseIcon />
+                    </IconButton>
+                </Box>}
                 {todos.length > 0 && <Typography variant="h6">Todos</Typography>}
-                {todos.length > 0 && todos.map((todo, index) => (
-                    <Box key={index}
-                        sx={{
-                            width: '100%',
-                            backgroundColor: 'white',
-                            borderRadius: '10px',
-                            padding: '10px',
-                            margin: '10px',
-                            boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}
-                    >
-                        <Typography variant="h6">{todo.todoTitle}</Typography>
-                        <Box sx={{display:'flex', gap:'1rem'}}>
-                            <Checkbox
-                                {...label}
-                                checked={todo.isCompleted}
-                                onChange={() => handleIsCompletedTodo(todo.id, todo.isCompleted)}
-                            />
-                            <IconButton aria-label="edit" onClick={() => handleEditTodo(todo.id)}>
-                                <EditIcon />
-                            </IconButton>
-                            <IconButton onClick={() => handletododelete(todo.id)} aria-label="delete">
-                                <DeleteIcon />
-                            </IconButton>
-                        </Box>
+                <Box sx={{ height: '10rem' }}>
+                    <Box sx={{ overflowY: 'auto', height: '100%' }}>
+                        {todos.length > 0 && todos.map((todo, index) => (
+                            <Box key={index}
+                                sx={{
+                                    width: '95%',
+                                    backgroundColor: 'white',
+                                    borderRadius: '10px',
+                                    padding: '0px 10px',
+                                    margin: '5px',
+                                    boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <Typography variant="h6">{todo.todoTitle}</Typography>
+                                <Box sx={{ display: 'flex', gap: '1rem' }}>
+                                    <Checkbox
+                                        {...label}
+                                        checked={todo.isCompleted}
+                                        onChange={() => handleIsCompletedTodo(todo.id, todo.isCompleted)}
+                                    />
+                                    <IconButton aria-label="edit" onClick={() => handleEditTodo(todo.id)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton onClick={() => handletododelete(todo.id)} aria-label="delete">
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Box>
+                            </Box>
+                        ))}
                     </Box>
-                ))
-                }
+                </Box>
+
             </Box>
         </>
     );

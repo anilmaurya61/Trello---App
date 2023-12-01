@@ -6,7 +6,7 @@ import { createCard, deleteList, deleteCard, editCardTitle } from '../services/f
 import { useParams } from "react-router-dom";
 
 
-export default function Cards2({ listData }) {
+export default function Cards({ listData }) {
 
     const [addaCard, setAddaCard] = useState(true);
     const [cards, setCards] = useState(listData?.Cards || []);

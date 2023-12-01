@@ -57,6 +57,7 @@ const getBoardsById = async (boardId) => {
   }
 }
 
+
 const getListsById = async (id) => {
 
   try {
@@ -85,6 +86,7 @@ const deleteBoard = async (id) => {
     throw err;
   }
 };
+
 
 const deleteList = async ({ boardId, listId }) => {
   try {
@@ -183,6 +185,8 @@ const createCard = async (cardData) => {
     throw e;
   }
 };
+
+
 const editCardTitle = async ({ editedCardTitle, cardId, boardId, listId }) => {
   try {
     const docRef = doc(db, "Lists", boardId);
@@ -390,10 +394,10 @@ const updateTodo = async (boardId, listId, cardId, todoId, updatedTodoData) => {
       await updateDoc(listDocRef, { allLists: updatedLists });
 
       console.log('Todo updated with ID: ', todoId);
-      return true; // Indicate successful update
+      return true;
     } else {
       console.error('Board with ID does not exist:', boardId);
-      return false; // Indicate failure due to missing board
+      return false; 
     }
   } catch (e) {
     console.error('Error updating todo:', e);

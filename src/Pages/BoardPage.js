@@ -10,7 +10,7 @@ import { getBoards, deleteBoard, getBoardsById } from '../services/firestoreServ
 import { useAuth } from '../services/AuthContext';
 import loaderGif from '../assets/loader.gif'
 import { getListsById } from '../services/firestoreService'
-import Cards2 from '../Components/Cards2';
+import Cards from '../Components/Cards';
 
 import {
     Box,
@@ -96,9 +96,11 @@ export default function PersistentDrawerLeft() {
     const handleListClick = () => {
         setListsCount(prevCount => prevCount + 1);
     };
+
     const handleDrawerOpen = () => {
         setOpen(true);
     };
+
     const handleDrawerClose = () => {
         setOpen(false);
     };
@@ -119,7 +121,7 @@ export default function PersistentDrawerLeft() {
             fetchData(user?.uid);
         }
 
-    }, [user]);
+    }, []);
 
     useEffect(() => {
         const fetchBoard = async (boardId) => {
@@ -240,7 +242,7 @@ export default function PersistentDrawerLeft() {
                     {currentBoardLists?.allLists &&
                         <Box sx={{ display: 'flex', gap: '1rem' }}>
                             {currentBoardLists.allLists.map((list, index) => (
-                                <Cards2 key={index} listData={list} />
+                                <Cards key={index} listData={list} />
                             ))}
                             
                         </Box>

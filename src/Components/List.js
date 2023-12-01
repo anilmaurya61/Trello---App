@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import Cards2 from './Cards2';
+import Cards from './Cards';
 import AddList from './AddList';
 import { useParams } from 'react-router-dom';
 import { createLists } from '../services/firestoreService';
@@ -21,7 +21,7 @@ const List = () => {
           <AddList handleCreateLists={handleCreateLists} setListTitle={setListTitle} setShowCard={setShowCard} />
           :
           <Box sx={{ display: 'flex', gap: '1rem' }}>
-            <Cards2 listData={{'listTitle':listTitle}} />
+            <Cards listData={{'listTitle':listTitle}} />
           </Box>
         }
       </Box>
