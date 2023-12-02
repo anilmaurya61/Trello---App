@@ -1,12 +1,25 @@
 import React, { useState } from "react";
 import { Button, TextField, Box, Typography, IconButton } from '@mui/material';
-import { AddOutlined as AddIcon, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { AddOutlined as AddIcon, 
+    Close as CloseIcon, 
+    Edit as EditIcon, 
+    Delete as DeleteIcon, 
+    ArrowLeft as ArrowLeftIcon,
+    ArrowRight as ArrowRightIcon 
+} from '@mui/icons-material';
 import CardDetails from "./CardDetails";
-import { createCard, deleteList, deleteCard, editCardTitle } from '../services/firestoreService'
+import { 
+    createCard, 
+    deleteList, 
+    deleteCard, 
+    editCardTitle,
+    shiftRightList,
+    shiftLeftList
+ } from '../services/firestoreService'
 import { useParams } from "react-router-dom";
 
 
-export default function Cards({ listData }) {
+export default function Cards({ listData, setboardDetails }) {
 
     const [addaCard, setAddaCard] = useState(true);
     const [cards, setCards] = useState(listData?.Cards || []);
@@ -17,6 +30,16 @@ export default function Cards({ listData }) {
     const { boardId } = useParams();
     const [editedCardTitle, setEditedCard] = useState('');
     const [cardId, setCardId] = useState('');
+
+    const handleArrowLeft = async() =>{
+        await shiftLeftList({'boardId': boardId, 'listId': listData.id});
+        setboardDetails();
+    }
+
+    const handleArrowRight = async() =>{
+        await shiftRightList({'boardId': boardId, 'listId': listData.id})
+        setboardDetails();
+    }
 
     const handleCardEditTitleChange = (event) => {
         setEditedCard(event.target.value)
@@ -54,7 +77,7 @@ export default function Cards({ listData }) {
     }
 
     const handleCardDetailsState = ({ cardTitle, cardId }) => {
-        setCardDetailsData({ boardId, cardTitle, cardId,'listId': listData.id, listData })
+        setCardDetailsData({ boardId, cardTitle, cardId, 'listId': listData.id, listData })
         setCardDetailsState(!cardDetailsState)
     }
 
@@ -70,6 +93,7 @@ export default function Cards({ listData }) {
 
     const handleListDelete = async () => {
         await deleteList({ 'boardId': boardId, 'listId': listData.id })
+        setboardDetails();
     }
     const handleCardDelete = async (id) => {
         let cardsData = cards.filter(c => c.cardId == id);
@@ -80,12 +104,22 @@ export default function Cards({ listData }) {
     return (
         <>
             <Box sx={{ width: '300px', backgroundColor: '#ebecf0', borderRadius: '10px', padding: '16px' }}>
+                <Box>
+                    <IconButton>
+                        <ArrowLeftIcon onClick = {handleArrowLeft} />
+                    </IconButton>
+                    <IconButton>
+                        <ArrowRightIcon onClick = {handleArrowRight} />
+                    </IconButton>
+                </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography variant="h6">{listData.listTitle}</Typography>
                     <IconButton aria-label="delete" onClick={() => handleListDelete(listData.id)}>
                         <CloseIcon />
                     </IconButton>
+
                 </Box>
+
                 {isEdit && <Box sx={{
                     padding: '10px',
                     margin: '10px'

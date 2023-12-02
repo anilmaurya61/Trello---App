@@ -26,6 +26,7 @@ const AddList = ({handleCreateLists, setListTitle, setShowCard}) => {
           startIcon={<AddIcon />}
           onClick={() => {
             handleAddButton();
+            
           }}        
           sx={{ width: '300px', justifyContent: 'flex-start', textAlign: 'left' }}
         >

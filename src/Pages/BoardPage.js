@@ -92,7 +92,15 @@ export default function PersistentDrawerLeft() {
     const [listsCount, setListsCount] = useState(1);
     const [currentBoard, setCurrentBoard] = useState(null);
     const [currentBoardLists, setCurrentBoardLists] = useState([]);
+    const [boardDetails, setboardDetails] = useState(null);
 
+    const getId = () => {
+        return new Date().getTime().toString();
+    }
+
+    const handleBoardDetails = () =>{
+        setboardDetails(getId())
+    }
     const handleListClick = () => {
         setListsCount(prevCount => prevCount + 1);
     };
@@ -124,6 +132,7 @@ export default function PersistentDrawerLeft() {
     }, []);
 
     useEffect(() => {
+        console.log("boardsDetails")
         const fetchBoard = async (boardId) => {
             let board = await getBoardsById(boardId);
             setCurrentBoard(board)
@@ -131,7 +140,7 @@ export default function PersistentDrawerLeft() {
             setCurrentBoardLists(Lists)
         }
         fetchBoard(boardId)
-    }, [boardId])
+    }, [boardId,boardDetails])
 
 
     async function handleDeleteBoard(id) {
@@ -240,14 +249,14 @@ export default function PersistentDrawerLeft() {
                     <DrawerHeader />
                     <Box sx={{ display: 'flex', gap: '1rem' }}>
                     {currentBoardLists?.allLists &&
-                        <Box sx={{ display: 'flex', gap: '1rem' }}>
+                        <Box sx={{ display: 'flex', gap: '1rem', alignItems:"start" }}>
                             {currentBoardLists.allLists.map((list, index) => (
-                                <Cards key={index} listData={list} />
+                                <Cards setboardDetails = {handleBoardDetails} key={index} listData={list} />
                             ))}
                             
                         </Box>
                     }
-                        <Lists/>
+                        <Lists setboardDetails = {handleBoardDetails} />
                     </Box>
                 </Main>
                     :

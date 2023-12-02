@@ -406,7 +406,6 @@ const updateTodo = async (boardId, listId, cardId, todoId, updatedTodoData) => {
 };
 
 
-
 const addComments = async ({ boardId, listId, cardId, comment }) => {
 
   try {
@@ -445,6 +444,7 @@ const addComments = async ({ boardId, listId, cardId, comment }) => {
     throw e;
   }
 };
+
 
 const getComments = async ({ boardId, listId, cardId }) => {
   try {
@@ -519,6 +519,74 @@ const deleteCard = async ({ boardId, listId, cardId }) => {
   }
 };
 
+const shiftRightList = async ({ boardId, listId }) => {
+  try {
+    const listsRef = collection(db, 'Lists');
+    const listDocRef = doc(listsRef, boardId);
+    const listDoc = await getDoc(listDocRef);
+
+    const currentData = listDoc.exists() ? listDoc.data() : { allLists: [] };
+    const allLists = currentData.allLists;
+
+    const currentIndex = allLists.findIndex((list) => list.id === listId);
+
+    if (currentIndex < allLists.length - 1) {
+      const updatedLists = [...allLists];
+      const temp = updatedLists[currentIndex];
+      updatedLists[currentIndex] = updatedLists[currentIndex + 1];
+      updatedLists[currentIndex + 1] = temp;
+
+      console.log(updatedLists);
+
+      if (listDoc.exists()) {
+        await updateDoc(listDocRef, { allLists: updatedLists });
+      } else {
+        await setDoc(listDocRef, { allLists: updatedLists });
+      }
+      console.log('List Shifted Right: ', listId);
+    } else {
+      console.log('List is already at the rightmost position');
+    }
+  } catch (e) {
+    console.error('Error shifting list to the right: ', e);
+    throw e;
+  }
+};
+
+
+const shiftLeftList = async ({ boardId, listId }) => {
+  try {
+    const listsRef = collection(db, 'Lists');
+    const listDocRef = doc(listsRef, boardId);
+    const listDoc = await getDoc(listDocRef);
+
+    const currentData = listDoc.exists() ? listDoc.data() : { allLists: [] };
+    const allLists = currentData.allLists;
+
+    const currentIndex = allLists.findIndex((list) => list.id === listId);
+
+    if (currentIndex > 0) {
+      const updatedLists = [...allLists];
+      const temp = updatedLists[currentIndex];
+      updatedLists[currentIndex] = updatedLists[currentIndex - 1];
+      updatedLists[currentIndex - 1] = temp;
+
+      console.log(updatedLists);
+
+      if (listDoc.exists()) {
+        await updateDoc(listDocRef, { allLists: updatedLists });
+      } else {
+        await setDoc(listDocRef, { allLists: updatedLists });
+      }
+    } else {
+      console.log('List is already at the leftmost position');
+    }
+  } catch (e) {
+    console.error('Error shifting list to the left: ', e);
+    throw e;
+  }
+};
+
 
 export {
   createBoard,
@@ -537,4 +605,6 @@ export {
   addComments,
   getComments,
   getListsById,
+  shiftRightList,
+  shiftLeftList,
 };
