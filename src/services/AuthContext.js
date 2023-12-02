@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
           navigate('/home');
         }
       } else {
+        navigate('/');
         setUser(null);
       }
     });
