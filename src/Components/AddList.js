@@ -35,7 +35,7 @@ const AddList = ({handleCreateLists, setListTitle, setShowCard}) => {
       :
       (
         <Box sx={{ backgroundColor: 'white', borderRadius: '10px', padding: '16px' }}>
-          <TextField onChange={ handleListTitleChange } label="List title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
+          <TextField  onChange={ handleListTitleChange } label="List title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
           <Button onClick={()=>{handleAddList(); handleCreateLists();}} variant="contained" sx={{ margin: '10px', width: '75%' }}>
             Add List
           </Button>

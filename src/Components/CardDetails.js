@@ -8,19 +8,26 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
 
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState('');
+    const [textError, setTextError] = useState('');
 
     const handleCommentChange = (event) => {
         setComment(event.target.value);
+        setTextError('');
     }
     const handleComment = async () => {
-        setComments([comment, ...comments]);
-        await addComments({
-            'boardId': cardDetailsData.boardId,
-            'listId': cardDetailsData.listData.id,
-            'cardId': cardDetailsData.cardId,
-            'comment': comment
-        })
-        setComment('');
+        if (comment.trim() != '') {
+            setComments([comment, ...comments]);
+            await addComments({
+                'boardId': cardDetailsData.boardId,
+                'listId': cardDetailsData.listData.id,
+                'cardId': cardDetailsData.cardId,
+                'comment': comment
+            })
+            setComment('');
+        }
+        else {
+            setTextError('Comment cannot be empty');
+        }
     }
     useEffect(() => {
         const fetchComments = async ({ boardId, listId, cardId }) => {
@@ -73,7 +80,8 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
                     <Todos cardInfo={cardDetailsData} />
                     <Box sx={{ width: '70%', margin: '0.5rem 15%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <TextField
-                            id="outlined-basic"
+                            error={textError !== ''} helperText={textError !== '' ? 'Comment cannot be empty' : ''}
+                            id="outlined-error"
                             label="Write a Comment ..."
                             variant="outlined"
                             sx={{ width: '60%', margin: '0.5rem 0' }}
@@ -87,20 +95,20 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
                         <Box sx={{ height: '15rem' }}>
                             <Box sx={{ overflowY: 'scroll', height: '100%' }}>
                                 {comments.length > 0 ? comments.map((comment, index) => (
-                                        <Typography
-                                            key={index}
-                                            sx={{
-                                                width: '100%',
-                                                display: 'table-row',
-                                                backgroundColor: '#f5f5f5',
-                                                padding: '10px',
-                                                margin: '10px',
-                                                borderRadius: '8px',
-                                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                            }}
-                                        >
-                                            {comment}
-                                        </Typography>
+                                    <Typography
+                                        key={index}
+                                        sx={{
+                                            width: '100%',
+                                            display: 'table-row',
+                                            backgroundColor: '#f5f5f5',
+                                            padding: '10px',
+                                            margin: '10px',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                        }}
+                                    >
+                                        {comment}
+                                    </Typography>
                                 ))
                                     :
                                     <Typography sx={{ marginLeft: '0.5rem', color: 'grey' }}>No Comments Yet</Typography>

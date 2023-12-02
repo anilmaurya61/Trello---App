@@ -10,6 +10,7 @@ export default function Todos({ cardInfo }) {
     const [isEdit, setIsEdit] = useState(false);
     const [updatedTodo, setUpdatedTodo] = useState('');
     const [todoId, setTodoId] = useState('');
+    const [textError, setTextError] = useState('');
 
 
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -40,18 +41,22 @@ export default function Todos({ cardInfo }) {
 
     const handleTodoTitleChange = (event) => {
         setTodo(event.target.value);
+        setTextError('')
     }
     const handleAddaTodo = () => {
         setAddaTodo(!addaTodo)
     }
 
     const handleAddTodo = async () => {
-        if (todo !== '') {
+        if (todo.trim() != '') {
             const updatedTodos = [{ 'todoTitle': todo }, ...todos];
             setTodos(updatedTodos);
             setTodo('');
+            await addTodo({ 'todo': todo, 'boardId': cardInfo.boardId, 'listId': cardInfo.listId, 'cardId': cardInfo.cardId, 'isCompleted': false });
         }
-        await addTodo({ 'todo': todo, 'boardId': cardInfo.boardId, 'listId': cardInfo.listId, 'cardId': cardInfo.cardId, 'isCompleted': false });
+        else{
+            setTextError('Title Can not be empty')
+        }
     }
 
     const handletododelete = async (todoId) => {
@@ -114,7 +119,8 @@ export default function Todos({ cardInfo }) {
                         justifyContent: 'space-between',
                         alignItems: 'center'
                     }}>
-                        <TextField value={todo} onChange={handleTodoTitleChange} label="Todo title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
+                        <TextField error={textError !== ''} helperText={textError !== '' ? 'Todo Title cannot be empty' : ''}
+                            id="outlined-error" value={todo} onChange={handleTodoTitleChange} label="Todo title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
                         <Button onClick={handleAddTodo} variant="contained" sx={{ margin: '10px', width: '5rem' }}>
                             Save
                         </Button>
