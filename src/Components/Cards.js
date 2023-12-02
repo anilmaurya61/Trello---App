@@ -1,28 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, TextField, Box, Typography, IconButton } from '@mui/material';
-import { AddOutlined as AddIcon, 
-    Close as CloseIcon, 
-    Edit as EditIcon, 
-    Delete as DeleteIcon, 
+import {
+    AddOutlined as AddIcon,
+    Close as CloseIcon,
+    Edit as EditIcon,
+    Delete as DeleteIcon,
     ArrowLeft as ArrowLeftIcon,
-    ArrowRight as ArrowRightIcon 
+    ArrowRight as ArrowRightIcon,
+    ArrowDropUp as ArrowDropUpIcon,
+    ArrowDropDown as ArrowDropDownIcon,
 } from '@mui/icons-material';
 import CardDetails from "./CardDetails";
-import { 
-    createCard, 
-    deleteList, 
-    deleteCard, 
+import {
+    createCard,
+    deleteList,
+    deleteCard,
     editCardTitle,
     shiftRightList,
-    shiftLeftList
- } from '../services/firestoreService'
+    shiftLeftList,
+    shiftCardUp,
+    shiftCardDown,
+
+} from '../services/firestoreService'
 import { useParams } from "react-router-dom";
 
 
-export default function Cards({ listData, setboardDetails }) {
+export default function Cards({ position, length, listData, setboardDetails }) {
 
     const [addaCard, setAddaCard] = useState(true);
-    const [cards, setCards] = useState(listData?.Cards || []);
+    const [cards, setCards] = useState([]);
     const [cardTitle, setCardTitle] = useState('');
     const [cardDetailsState, setCardDetailsState] = useState(false);
     const [cardDetailsData, setCardDetailsData] = useState({});
@@ -31,16 +37,28 @@ export default function Cards({ listData, setboardDetails }) {
     const [editedCardTitle, setEditedCard] = useState('');
     const [cardId, setCardId] = useState('');
 
-    const handleArrowLeft = async() =>{
-        await shiftLeftList({'boardId': boardId, 'listId': listData.id});
+    useEffect(() => {
+        setCards(listData?.Cards)
+    }, [listData])
+
+    const handleArrowLeft = async () => {
+        await shiftLeftList({ 'boardId': boardId, 'listId': listData.id });
         setboardDetails();
     }
 
-    const handleArrowRight = async() =>{
-        await shiftRightList({'boardId': boardId, 'listId': listData.id})
+    const handleArrowRight = async () => {
+        await shiftRightList({ 'boardId': boardId, 'listId': listData.id })
         setboardDetails();
     }
 
+    const handleCardUp = async (cardId) => {
+        await shiftCardUp({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
+        setboardDetails();
+    }
+    const handleCardDown = async (cardId) => {
+        await shiftCardDown({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
+        setboardDetails();
+    }
     const handleCardEditTitleChange = (event) => {
         setEditedCard(event.target.value)
     }
@@ -72,6 +90,7 @@ export default function Cards({ listData, setboardDetails }) {
     const handleCardTitleChange = (event) => {
         setCardTitle(event.target.value);
     }
+
     const handleAddaCard = () => {
         setAddaCard(!addaCard)
     }
@@ -83,11 +102,9 @@ export default function Cards({ listData, setboardDetails }) {
 
     const handleAddCard = async () => {
         if (cardTitle !== '') {
-            const updatedCards = [...cards];
-            updatedCards.push({ 'cardTitle': cardTitle });
-            setCards(updatedCards);
             setCardTitle('');
             await createCard({ 'cardTitle': cardTitle, 'boardId': boardId, 'listId': listData.id });
+            setboardDetails();
         }
     }
 
@@ -99,18 +116,31 @@ export default function Cards({ listData, setboardDetails }) {
         let cardsData = cards.filter(c => c.cardId == id);
         setCards(cardsData)
         await deleteCard({ 'boardId': boardId, 'listId': listData.id, 'cardId': id })
+        setboardDetails();
     };
 
     return (
         <>
             <Box sx={{ width: '300px', backgroundColor: '#ebecf0', borderRadius: '10px', padding: '16px' }}>
                 <Box>
-                    <IconButton>
-                        <ArrowLeftIcon onClick = {handleArrowLeft} />
+                    {position > 0 ? <IconButton >
+                        <ArrowLeftIcon onClick={handleArrowLeft} />
+                    </IconButton> 
+                    : 
+                    <IconButton disabled={true} >
+                        <ArrowLeftIcon onClick={handleArrowLeft} />
                     </IconButton>
+                    }
+
+                    {position != length ? 
                     <IconButton>
-                        <ArrowRightIcon onClick = {handleArrowRight} />
+                        <ArrowRightIcon onClick={handleArrowRight} />
                     </IconButton>
+                    :
+                    <IconButton disabled={true}>
+                        <ArrowRightIcon onClick={handleArrowRight} />
+                    </IconButton>
+                    }
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography variant="h6">{listData.listTitle}</Typography>
@@ -165,6 +195,22 @@ export default function Cards({ listData, setboardDetails }) {
                                 <IconButton aria-label="delete" onClick={() => handleCardDelete(card.cardId)}>
                                     <DeleteIcon />
                                 </IconButton>
+                                {index > 0 ?
+                                <IconButton>
+                                    <ArrowDropUpIcon onClick={() => handleCardUp(card.cardId)} />
+                                </IconButton>
+                                :
+                                <IconButton disabled={true}>
+                                    <ArrowDropUpIcon onClick={() => handleCardUp(card.cardId)} />
+                                </IconButton>}
+                                {index != cards.length - 1 ?
+                                 <IconButton>
+                                    <ArrowDropDownIcon onClick={() => handleCardDown(card.cardId)} />
+                                </IconButton>
+                                :
+                                <IconButton disabled={true}>
+                                    <ArrowDropDownIcon onClick={() => handleCardDown(card.cardId)} />
+                                </IconButton>}
                             </Box>
                         </Box>
                     )

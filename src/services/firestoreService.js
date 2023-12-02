@@ -587,6 +587,89 @@ const shiftLeftList = async ({ boardId, listId }) => {
   }
 };
 
+const shiftCardUp = async (cardData) => {
+  try {
+    const docRef = doc(db, "Lists", cardData.boardId);
+
+    const docSnapshot = await getDoc(docRef);
+
+    if (docSnapshot.exists()) {
+      let data = { ...docSnapshot.data() };
+
+      const updatedLists = data.allLists.map((list) => {
+        if (list.id === cardData.listId) {
+          const cardIndex = list.Cards.findIndex((card) => card.cardId == cardData.cardId);
+
+          // Check if the card is not already at the top
+          if (cardIndex > 0) {
+            const updatedCards = [...list.Cards];
+            const temp = updatedCards[cardIndex];
+            updatedCards[cardIndex] = updatedCards[cardIndex - 1];
+            updatedCards[cardIndex - 1] = temp;
+
+            return {
+              ...list,
+              Cards: updatedCards,
+            };
+          }
+        }
+        return list;
+      });
+
+      await updateDoc(docRef, { allLists: updatedLists });
+
+      console.log('Card moved up for list with ID: ', cardData.listId);
+    } else {
+      console.error('List with ID does not exist: ', cardData.listId);
+      return null;
+    }
+  } catch (e) {
+    console.error('Error moving card up: ', e);
+    throw e;
+  }
+};
+
+const shiftCardDown = async (cardData) => {
+  try {
+    const docRef = doc(db, "Lists", cardData.boardId);
+
+    const docSnapshot = await getDoc(docRef);
+
+    if (docSnapshot.exists()) {
+      let data = { ...docSnapshot.data() };
+
+      const updatedLists = data.allLists.map((list) => {
+        if (list.id === cardData.listId) {
+          const cardIndex = list.Cards.findIndex((card) => card.cardId === cardData.cardId);
+
+          // Check if the card is not already at the bottom
+          if (cardIndex < list.Cards.length - 1) {
+            const updatedCards = [...list.Cards];
+            const temp = updatedCards[cardIndex];
+            updatedCards[cardIndex] = updatedCards[cardIndex + 1];
+            updatedCards[cardIndex + 1] = temp;
+
+            return {
+              ...list,
+              Cards: updatedCards,
+            };
+          }
+        }
+        return list;
+      });
+
+      await updateDoc(docRef, { allLists: updatedLists });
+
+      console.log('Card moved down for list with ID: ', cardData.listId);
+    } else {
+      console.error('List with ID does not exist: ', cardData.listId);
+      return null;
+    }
+  } catch (e) {
+    console.error('Error moving card down: ', e);
+    throw e;
+  }
+};
 
 export {
   createBoard,
@@ -607,4 +690,6 @@ export {
   getListsById,
   shiftRightList,
   shiftLeftList,
+  shiftCardUp,
+  shiftCardDown,
 };

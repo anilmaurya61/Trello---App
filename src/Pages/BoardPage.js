@@ -251,7 +251,7 @@ export default function PersistentDrawerLeft() {
                     {currentBoardLists?.allLists &&
                         <Box sx={{ display: 'flex', gap: '1rem', alignItems:"start" }}>
                             {currentBoardLists.allLists.map((list, index) => (
-                                <Cards setboardDetails = {handleBoardDetails} key={index} listData={list} />
+                                <Cards setboardDetails = {handleBoardDetails} key={index} position = {index} length={currentBoardLists.allLists.length-1} listData={list} />
                             ))}
                             
                         </Box>
