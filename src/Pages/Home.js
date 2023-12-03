@@ -96,12 +96,20 @@ const Home = () => {
                                 marginX: '5rem'
                             }}
                         >
-                            <Typography sx={{ flexGrow: 1 }}>{board.boardName}</Typography>
-                            <Link to={`${encodeURIComponent(board.boardName)}/${board.id}`}>
-                                <IconButton sx={{ marginRight: '30px', color: 'grey' }} > <EditIcon/></IconButton></Link>
-                            <IconButton aria-label="delete" sx={{ marginRight: '20px', color: 'grey' }}>
-                                <DeleteIcon onClick={() => handleDeleteBoard(board.id)} />
-                            </IconButton>
+                            <Link to={`${encodeURIComponent(board.boardName)}/${board.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <Typography width='350px'>{board.boardName}</Typography>
+                            </Link>
+
+                            <Box>
+                                <Link to={`${encodeURIComponent(board.boardName)}/${board.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <IconButton sx={{ marginRight: '30px', color: 'grey' }}>
+                                        <EditIcon />
+                                    </IconButton>
+                                </Link>
+                                <IconButton aria-label="delete" >
+                                    <DeleteIcon onClick={() => handleDeleteBoard(board.id)} />
+                                </IconButton>
+                            </Box>
                         </Box>
 
                     ))}
