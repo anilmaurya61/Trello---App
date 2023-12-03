@@ -20,6 +20,8 @@ import {
     shiftLeftList,
     shiftCardUp,
     shiftCardDown,
+    cardRightShift,
+    cardLeftShift
 
 } from '../services/firestoreService'
 import { useParams } from "react-router-dom";
@@ -41,6 +43,15 @@ export default function Cards({ position, length, listData, setboardDetails }) {
         setCards(listData?.Cards)
     }, [listData])
 
+    const handleCardLeft = async (cardId) => {
+        await cardLeftShift({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
+        setboardDetails();
+    }
+
+    const handleCardRight = async (cardId) => {
+        await cardRightShift({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
+        setboardDetails();
+    }
     const handleArrowLeft = async () => {
         await shiftLeftList({ 'boardId': boardId, 'listId': listData.id });
         setboardDetails();
@@ -96,7 +107,7 @@ export default function Cards({ position, length, listData, setboardDetails }) {
     }
 
     const handleCardDetailsState = ({ cardTitle, cardId }) => {
-        setCardDetailsData({ boardId, cardTitle, cardId, 'listId': listData.id, listData })
+        setCardDetailsData({ boardId, cardTitle, cardId, 'listId': listData.id, listData, setboardDetails })
         setCardDetailsState(!cardDetailsState)
     }
 
@@ -125,21 +136,21 @@ export default function Cards({ position, length, listData, setboardDetails }) {
                 <Box>
                     {position > 0 ? <IconButton >
                         <ArrowLeftIcon onClick={handleArrowLeft} />
-                    </IconButton> 
-                    : 
-                    <IconButton disabled={true} >
-                        <ArrowLeftIcon onClick={handleArrowLeft} />
                     </IconButton>
+                        :
+                        <IconButton disabled={true} >
+                            <ArrowLeftIcon onClick={handleArrowLeft} />
+                        </IconButton>
                     }
 
-                    {position != length ? 
-                    <IconButton>
-                        <ArrowRightIcon onClick={handleArrowRight} />
-                    </IconButton>
-                    :
-                    <IconButton disabled={true}>
-                        <ArrowRightIcon onClick={handleArrowRight} />
-                    </IconButton>
+                    {position != length ?
+                        <IconButton>
+                            <ArrowRightIcon onClick={handleArrowRight} />
+                        </IconButton>
+                        :
+                        <IconButton disabled={true}>
+                            <ArrowRightIcon onClick={handleArrowRight} />
+                        </IconButton>
                     }
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -147,7 +158,6 @@ export default function Cards({ position, length, listData, setboardDetails }) {
                     <IconButton aria-label="delete" onClick={() => handleListDelete(listData.id)}>
                         <CloseIcon />
                     </IconButton>
-
                 </Box>
 
                 {isEdit && <Box sx={{
@@ -175,16 +185,13 @@ export default function Cards({ position, length, listData, setboardDetails }) {
                     return (
                         <Box key={index}
                             sx={{
-                                width: '250px',
+                                width: '260px',
                                 backgroundColor: 'white',
                                 minHeight: '20px',
                                 borderRadius: '10px',
                                 padding: '10px',
-                                margin: '10px',
+                                margin: '8px',
                                 boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
                             }}
                         >
                             <Typography onClick={() => handleCardDetailsState({ 'cardTitle': card.cardTitle, 'cardId': card.cardId })} variant="h6">{card.cardTitle}</Typography>
@@ -196,21 +203,37 @@ export default function Cards({ position, length, listData, setboardDetails }) {
                                     <DeleteIcon />
                                 </IconButton>
                                 {index > 0 ?
-                                <IconButton>
-                                    <ArrowDropUpIcon onClick={() => handleCardUp(card.cardId)} />
-                                </IconButton>
-                                :
-                                <IconButton disabled={true}>
-                                    <ArrowDropUpIcon onClick={() => handleCardUp(card.cardId)} />
-                                </IconButton>}
+                                    <IconButton>
+                                        <ArrowDropUpIcon onClick={() => handleCardUp(card.cardId)} />
+                                    </IconButton>
+                                    :
+                                    <IconButton disabled={true}>
+                                        <ArrowDropUpIcon/>
+                                    </IconButton>}
                                 {index != cards.length - 1 ?
-                                 <IconButton>
-                                    <ArrowDropDownIcon onClick={() => handleCardDown(card.cardId)} />
+                                    <IconButton>
+                                        <ArrowDropDownIcon onClick={() => handleCardDown(card.cardId)} />
+                                    </IconButton>
+                                    :
+                                    <IconButton disabled={true}>
+                                        <ArrowDropDownIcon/>
+                                    </IconButton>}
+                                {position > 0 ? <IconButton onClick={()=>handleCardLeft(card.cardId)}>
+                                    <ArrowLeftIcon />
                                 </IconButton>
-                                :
-                                <IconButton disabled={true}>
-                                    <ArrowDropDownIcon onClick={() => handleCardDown(card.cardId)} />
-                                </IconButton>}
+                                    :
+                                    <IconButton disabled={true}>
+                                        <ArrowLeftIcon />
+                                    </IconButton>}
+                                {position != length ?
+                                    <IconButton onClick={()=>handleCardRight(card.cardId)}>
+                                        <ArrowRightIcon />
+                                    </IconButton>
+                                    :
+                                    <IconButton disabled={true}>
+                                        <ArrowRightIcon />
+                                    </IconButton>
+                                }
                             </Box>
                         </Box>
                     )

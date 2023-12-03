@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { TextField, Box, ImageList, ImageListItem, Button, Stack } from '@mui/material';
+import { TextField, Box, ImageListItem,ImageList, Button, Stack } from '@mui/material';
 import { AddCircleOutline as AddCircleOutlineIcon, Cancel as CancelIcon, Save as SendIcon } from '@mui/icons-material';
 import { createBoard } from '../services/firestoreService';
 import MyApp from '../services/title';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import LoadingButton from '@mui/lab/LoadingButton';
+import ImageItem from './ImageItem';
 
 const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
   const [selectedImage, setSelectedImage] = useState("https://firebasestorage.googleapis.com/v0/b/trello-app-13979.appspot.com/o/Images%2Fimage7.jpg?alt=media&token=b2b60508-605a-4ff9-ba6b-e2ff3ba3a20b")
@@ -26,8 +27,6 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
       else {
         setTextError('Board name cannot be empty');
       }
-
-
     } catch (error) {
       console.error('Error:', error);
       toast.error('Error creating board 🤯');
@@ -84,12 +83,9 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
           <span style={{margin:'10px', color:'grey'}}>Select Board Background</span>
           <ImageList sx={{ width: 450, height: 300, marginTop: '10px' }} cols={4} rowHeight={100} rows={3}>
             {imageData.map((item, index) => (
+              
               <ImageListItem key={index}>
-                <img
-                  src={item}
-                  alt={item}
-                  onClick={() => setSelectedImage(item)}
-                />
+                <ImageItem key={index} item={item} onClick={setSelectedImage} />
               </ImageListItem>
             ))}
           </ImageList>

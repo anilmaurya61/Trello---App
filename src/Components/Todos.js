@@ -11,6 +11,8 @@ export default function Todos({ cardInfo }) {
     const [updatedTodo, setUpdatedTodo] = useState('');
     const [todoId, setTodoId] = useState('');
     const [textError, setTextError] = useState('');
+    const [isDeleted, setIsDeleted] = useState(null);
+    const [isAddedTodo, setIsAddedTodo] = useState(null);
 
 
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
@@ -30,10 +32,11 @@ export default function Todos({ cardInfo }) {
         };
 
         fetchTodo();
-    }, []);
-    const handleEditTodo = (todoId) => {
+    },[isDeleted, isAddedTodo]);
+    const handleEditTodo = (todoId, todoTitle) => {
         setIsEdit(true);
         setTodoId(todoId);
+        setUpdatedTodo(todoTitle);
     }
     const handleEditTodoTitle = (event) => {
         setUpdatedTodo(event.target.value);
@@ -50,9 +53,10 @@ export default function Todos({ cardInfo }) {
     const handleAddTodo = async () => {
         if (todo.trim() != '') {
             const updatedTodos = [{ 'todoTitle': todo }, ...todos];
-            setTodos(updatedTodos);
             setTodo('');
+            setAddaTodo(!addaTodo)
             await addTodo({ 'todo': todo, 'boardId': cardInfo.boardId, 'listId': cardInfo.listId, 'cardId': cardInfo.cardId, 'isCompleted': false });
+            setIsAddedTodo(updatedTodos);
         }
         else{
             setTextError('Title Can not be empty')
@@ -61,6 +65,7 @@ export default function Todos({ cardInfo }) {
 
     const handletododelete = async (todoId) => {
         await deleteTodo({ 'todoId': todoId, 'boardId': cardInfo.boardId, 'listId': cardInfo.listId, 'cardId': cardInfo.cardId })
+        setIsDeleted(todoId)
     }
 
     const handleIsCompletedTodo = async (todoId, isCompleted) => {
@@ -82,8 +87,6 @@ export default function Todos({ cardInfo }) {
 
     const handleUpdateTodo = async () => {
         try {
-
-
             const updatedTodoData = {
                 'todoTitle': updatedTodo,
             };
@@ -129,6 +132,8 @@ export default function Todos({ cardInfo }) {
                         </IconButton>
                     </Box>
                 }
+                
+                {todos.length > 0 && <Typography variant="h6">Todos</Typography>}
                 {isEdit && <Box sx={{
                     width: '100%',
                     backgroundColor: 'white',
@@ -144,12 +149,11 @@ export default function Todos({ cardInfo }) {
                     <Button onClick={handleUpdateTodo} variant="contained" sx={{ margin: '10px', width: '5rem' }}>
                         Save
                     </Button>
-                    <IconButton onClick={handleAddaTodo}>
+                    <IconButton onClick={()=> setIsEdit(false)}>
                         <CloseIcon />
                     </IconButton>
                 </Box>}
-                {todos.length > 0 && <Typography variant="h6">Todos</Typography>}
-                <Box sx={{ height: '10rem' }}>
+                <Box sx={{ height: '15rem' }}>
                     <Box sx={{ overflowY: 'auto', height: '100%' }}>
                         {todos.length > 0 && todos.map((todo, index) => (
                             <Box key={index}
@@ -172,7 +176,7 @@ export default function Todos({ cardInfo }) {
                                         checked={todo.isCompleted}
                                         onChange={() => handleIsCompletedTodo(todo.id, todo.isCompleted)}
                                     />
-                                    <IconButton aria-label="edit" onClick={() => handleEditTodo(todo.id)}>
+                                    <IconButton aria-label="edit" onClick={() => handleEditTodo(todo.id, todo.todoTitle)}>
                                         <EditIcon />
                                     </IconButton>
                                     <IconButton onClick={() => handletododelete(todo.id)} aria-label="delete">
@@ -183,7 +187,6 @@ export default function Todos({ cardInfo }) {
                         ))}
                     </Box>
                 </Box>
-
             </Box>
         </>
     );

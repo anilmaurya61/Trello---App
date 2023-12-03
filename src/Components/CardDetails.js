@@ -92,17 +92,17 @@ const CardDetails = ({ cardDetailsData, setCardDetailsState }) => {
                     </Box>
                     <Box sx={{ width: '70%', margin: '0.5rem 15%', display: 'table' }}>
                         <Typography>Comments</Typography>
-                        <Box sx={{ height: '15rem' }}>
-                            <Box sx={{ overflowY: 'scroll', height: '100%' }}>
+                        <Box sx={{ height: '10rem' }}>
+                            <Box sx={{ overflowY: 'auto', height:'100%'}}>
                                 {comments.length > 0 ? comments.map((comment, index) => (
                                     <Typography
                                         key={index}
                                         sx={{
-                                            width: '100%',
-                                            display: 'table-row',
+                                            width: '500px',
+                                            height:'35px',
                                             backgroundColor: '#f5f5f5',
-                                            padding: '10px',
-                                            margin: '10px',
+                                            padding: '5px 10px',
+                                            margin: '5px',
                                             borderRadius: '8px',
                                             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                                         }}

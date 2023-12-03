@@ -132,7 +132,6 @@ export default function PersistentDrawerLeft() {
     }, []);
 
     useEffect(() => {
-        console.log("boardsDetails")
         const fetchBoard = async (boardId) => {
             let board = await getBoardsById(boardId);
             setCurrentBoard(board)
@@ -160,7 +159,8 @@ export default function PersistentDrawerLeft() {
         <>
             <MyApp dynamicTitle={boardName} />
             <ToastContainer />
-            <Box sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex'}}>
+
                 <CssBaseline />
                 <AppBar position="fixed" open={open} >
                     <Toolbar>
@@ -244,7 +244,6 @@ export default function PersistentDrawerLeft() {
                     backgroundSize: 'cover',
                     minHeight: '100vh',
                     width: '100%',
-                    height: '100%',
                 }}>
                     <DrawerHeader />
                     <Box sx={{ display: 'flex', gap: '1rem' }}>

@@ -3,3 +3,15 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+@media only screen and (max-width: 767px) {
+  body::before {
+    content: "Mobile not supported. Please use a larger screen.";
+    display: block;
+    background-color: #f00; 
+    color: #fff; 
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+}

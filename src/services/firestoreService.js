@@ -304,7 +304,7 @@ const getTodo = async ({ boardId, listId, cardId }) => {
   }
 };
 
-const deleteTodo = async ({boardId, listId, cardId, todoId}) => {
+const deleteTodo = async ({ boardId, listId, cardId, todoId }) => {
   try {
     const listsRef = collection(db, 'Lists');
     const listDocRef = doc(listsRef, boardId);
@@ -397,7 +397,7 @@ const updateTodo = async (boardId, listId, cardId, todoId, updatedTodoData) => {
       return true;
     } else {
       console.error('Board with ID does not exist:', boardId);
-      return false; 
+      return false;
     }
   } catch (e) {
     console.error('Error updating todo:', e);
@@ -434,7 +434,6 @@ const addComments = async ({ boardId, listId, cardId, comment }) => {
         }
         return list;
       });
-      console.log("comment", updatedLists);
       await updateDoc(listDocRef, { allLists: updatedLists });
 
       console.log('Comment Added', comment);
@@ -461,7 +460,6 @@ const getComments = async ({ boardId, listId, cardId }) => {
         const targetCard = targetList.Cards.find((card) => card.cardId == cardId);
 
         if (targetCard && targetCard.comments) {
-          console.log('Comments for Card with ID:', cardId, targetCard.comments);
           return targetCard.comments;
         } else {
           console.log('Card not found or no comments available.');
@@ -493,14 +491,10 @@ const deleteCard = async ({ boardId, listId, cardId }) => {
     if (listDoc.exists()) {
       const currentData = listDoc.data();
 
-      console.log(currentData);
-
       const updatedLists = currentData.allLists.map((list) => {
         console.log(list);
         if (list.id == listId) {
-          console.log("a", list.Cards)
           const updatedCards = list.Cards.filter((card) => card.cardId != cardId);
-          console.log("bb", updatedCards)
           return {
             ...list,
             Cards: updatedCards,
@@ -671,6 +665,106 @@ const shiftCardDown = async (cardData) => {
   }
 };
 
+const cardRightShift = async (cardData) => {
+  try {
+    const docRef = doc(db, "Lists", cardData.boardId);
+
+    const docSnapshot = await getDoc(docRef);
+
+    if (docSnapshot.exists()) {
+      let data = { ...docSnapshot.data() };
+      let listIndex = -1;
+      let foundCard = null;
+      
+      const updatedLists = data.allLists.map((list, index) => {
+       
+        if (list.id == cardData.listId) {
+          listIndex = index;
+          foundCard =  list.Cards.find((card) => card.cardId == cardData.cardId);
+          const updatedCards = list.Cards.filter((card) => card.cardId != cardData.cardId);
+          return { ...list, Cards: updatedCards };
+        }
+        return list;
+      });
+
+      if (listIndex != -1 && foundCard) {
+        const nextListIndex = (listIndex + 1) % data.allLists.length;
+        const nextList = data.allLists[nextListIndex];
+
+        const updatedNextList = {
+          ...nextList,
+          Cards: [...nextList.Cards, foundCard],
+        };
+
+        updatedLists[nextListIndex] = updatedNextList;
+
+        await updateDoc(docRef, { allLists: updatedLists });
+
+        console.log('Card moved down for list with ID: ', cardData.listId);
+      } else {
+        console.error('Card not found in the list: ', cardData.cardId);
+        return null;
+      }
+    } else {
+      console.error('List with ID does not exist: ', cardData.listId);
+      return null;
+    }
+  } catch (e) {
+    console.error('Error moving card down: ', e);
+    throw e;
+  }
+};
+
+const cardLeftShift = async (cardData) => {
+  try {
+    const docRef = doc(db, "Lists", cardData.boardId);
+
+    const docSnapshot = await getDoc(docRef);
+
+    if (docSnapshot.exists()) {
+      let data = { ...docSnapshot.data() };
+      let listIndex = -1;
+      let foundCard = null;
+
+      const updatedLists = data.allLists.map((list, index) => {
+        if (list.id === cardData.listId) {
+          listIndex = index;
+          foundCard = list.Cards.find((card) => card.cardId === cardData.cardId);
+          const updatedCards = list.Cards.filter((card) => card.cardId !== cardData.cardId);
+          return { ...list, Cards: updatedCards };
+        }
+        return list;
+      });
+
+      if (listIndex !== -1 && foundCard) {
+        const prevListIndex = (listIndex - 1 + data.allLists.length) % data.allLists.length;
+        const prevList = data.allLists[prevListIndex];
+
+        const updatedPrevList = {
+          ...prevList,
+          Cards: [...prevList.Cards, foundCard],
+        };
+
+        updatedLists[prevListIndex] = updatedPrevList;
+
+        await updateDoc(docRef, { allLists: updatedLists });
+
+        console.log('Card moved left for list with ID: ', cardData.listId);
+      } else {
+        console.error('Card not found in the list: ', cardData.cardId);
+        return null;
+      }
+    } else {
+      console.error('List with ID does not exist: ', cardData.listId);
+      return null;
+    }
+  } catch (e) {
+    console.error('Error moving card left: ', e);
+    throw e;
+  }
+};
+
+
 export {
   createBoard,
   getBoards,
@@ -692,4 +786,6 @@ export {
   shiftLeftList,
   shiftCardUp,
   shiftCardDown,
+  cardRightShift,
+  cardLeftShift,
 };
