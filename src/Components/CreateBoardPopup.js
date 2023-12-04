@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Box, ImageListItem,ImageList, Button, Stack } from '@mui/material';
+import { TextField, Box, ImageListItem, ImageList, Button, Stack } from '@mui/material';
 import { AddCircleOutline as AddCircleOutlineIcon, Cancel as CancelIcon, Save as SendIcon } from '@mui/icons-material';
 import { createBoard } from '../services/firestoreService';
 import MyApp from '../services/title';
@@ -80,20 +80,21 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
         >
           <TextField error={textError !== ''} helperText={textError !== '' ? 'Board name cannot be empty' : ''}
             id="outlined-error" value={boardName} onChange={handleBoardNameChange} label="Enter Board  Name here ..." variant="outlined" sx={{ width: '30rem', marginTop: '5rem' }} />
-          <span style={{margin:'10px', color:'grey'}}>Select Board Background</span>
-          <ImageList sx={{ width: 450, height: 300, marginTop: '10px' }} cols={4} rowHeight={100} rows={3}>
-            {imageData.map((item, index) => (
-              
-              <ImageListItem key={index}>
-                <ImageItem key={index} item={item} onClick={setSelectedImage} />
-              </ImageListItem>
-            ))}
-          </ImageList>
-          <span style={{margin:'5px', color:'grey'}}>Board Background</span>
+          <span style={{ margin: '10px', color: 'grey' }}>Select Board Background</span>
+          <Box sx={{Height:'50px'}}>
+            <ImageList sx={{ width: 450, height: 150, marginTop: '10px' }} cols={4} rowHeight={100} rows={3}>
+              {imageData.map((item, index) => (
+                <ImageListItem key={index} >
+                  <ImageItem key={index} item={item} onClick={setSelectedImage} />
+                </ImageListItem>
+              ))}
+            </ImageList>
+          </Box>
+          <span style={{ margin: '5px', color: 'grey' }}>Board Background</span>
           <img
             src={selectedImage}
             alt="selected image"
-            style={{ height: '100px', margin: '1rem' }}
+            style={{ height: '80px', margin: '1rem' }}
           />
           <Stack direction="row" spacing={2} sx={{ marginBottom: '20px' }}>
             <LoadingButton

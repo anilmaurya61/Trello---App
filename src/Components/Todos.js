@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, TextField, Box, Typography, IconButton, Checkbox } from '@mui/material';
 import { AddOutlined as AddIcon, Close as CloseIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { addTodo, getTodo, deleteTodo, updateTodo } from '../services/firestoreService'
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function Todos({ cardInfo }) {
     const [addaTodo, setAddaTodo] = useState(true);
@@ -73,13 +74,14 @@ export default function Todos({ cardInfo }) {
             const updatedTodoData = {
                 'isCompleted': !isCompleted,
             };
+            !isCompleted && toast.success("Todo is Completed")
             setTodos((prevTodos) =>
                 prevTodos.map((prevTodo) =>
                     prevTodo.id === todoId ? { ...prevTodo, isCompleted: !prevTodo.isCompleted } : prevTodo
                 )
             );
             await updateTodo(cardInfo.boardId, cardInfo.listId, cardInfo.cardId, todoId, updatedTodoData);
-
+            toast.dismiss()
         } catch (error) {
             console.error('Error updating todo:', error);
         }
@@ -155,6 +157,7 @@ export default function Todos({ cardInfo }) {
                 </Box>}
                 <Box sx={{ height: '15rem' }}>
                     <Box sx={{ overflowY: 'auto', height: '100%' }}>
+                        <ToastContainer/>
                         {todos.length > 0 && todos.map((todo, index) => (
                             <Box key={index}
                                 sx={{

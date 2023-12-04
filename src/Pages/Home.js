@@ -12,19 +12,20 @@ import { Delete as DeleteIcon, ModeEdit as EditIcon } from '@mui/icons-material'
 import { BoardsSkeleton } from '../Components/Skeleton';
 import { ToastContainer, toast } from 'react-toastify';
 
-
-
 const Home = () => {
     const { signOut, user } = useAuth();
     const [isCreateBoardPopupOpen, setIsCreateBoardPopupOpen] = useState(false);
     const [imageData, setImageData] = useState([]);
     const [boards, setBoards] = useState([]);
     const navigate = useNavigate()
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchData = async (userId) => {
             try {
+                setLoading(true)
                 const boards = await getBoards(userId);
+                setLoading(false);
                 setBoards(boards);
                 const images = await getImagesFromStorage();
                 setImageData(images);
@@ -79,10 +80,9 @@ const Home = () => {
             </Box>
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Typography sx={{ fontSize: '2rem', fontWeight: '900', margin: '1rem 5rem' }}>Your Boards</Typography>
-                {boards.length === 0 ?
-                    <BoardsSkeleton />
+                {boards.length == 0 ?
+                     loading ? <BoardsSkeleton /> : <Typography variant="h6" sx={{margin:'20px', color:'grey'}}>You have not created a board</Typography>
                     : boards?.map((board) => (
-
                         <Box key={board.id}
                             sx={{
                                 border: '1px solid #ccc',
