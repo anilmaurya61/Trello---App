@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, TextField, Box, Typography, IconButton } from '@mui/material';
+import { Button, TextField, Box, Typography, IconButton, Skeleton } from '@mui/material';
 import {
     AddOutlined as AddIcon,
     Close as CloseIcon,
@@ -38,6 +38,7 @@ export default function Cards({ position, length, listData, setboardDetails }) {
     const { boardId } = useParams();
     const [editedCardTitle, setEditedCard] = useState('');
     const [cardId, setCardId] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setCards(listData?.Cards)
@@ -113,9 +114,12 @@ export default function Cards({ position, length, listData, setboardDetails }) {
 
     const handleAddCard = async () => {
         if (cardTitle !== '') {
+            setLoading(true)
             setCardTitle('');
+            setAddaCard(true);
             await createCard({ 'cardTitle': cardTitle, 'boardId': boardId, 'listId': listData.id });
             setboardDetails();
+            setLoading(false);
         }
     }
 
@@ -242,6 +246,8 @@ export default function Cards({ position, length, listData, setboardDetails }) {
                     )
                 })
                 }
+                {loading && <Skeleton variant="rounded" sx={{marginLeft:'10px'}} height={80} />}
+
                 {addaCard ?
                     <Button onClick={handleAddaCard} variant="outlined" startIcon={<AddIcon />} sx={{ margin: '10px', width: '75%' }}>
                         Add a card
