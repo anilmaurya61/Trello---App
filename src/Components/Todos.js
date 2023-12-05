@@ -15,7 +15,6 @@ export default function Todos({ cardInfo }) {
     const [isDeleted, setIsDeleted] = useState(null);
     const [isAddedTodo, setIsAddedTodo] = useState(null);
 
-
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
 
     useEffect(() => {
@@ -33,7 +32,7 @@ export default function Todos({ cardInfo }) {
         };
 
         fetchTodo();
-    },[isDeleted, isAddedTodo]);
+    }, [isDeleted, isAddedTodo]);
     const handleEditTodo = (todoId, todoTitle) => {
         setIsEdit(true);
         setTodoId(todoId);
@@ -59,7 +58,7 @@ export default function Todos({ cardInfo }) {
             await addTodo({ 'todo': todo, 'boardId': cardInfo.boardId, 'listId': cardInfo.listId, 'cardId': cardInfo.cardId, 'isCompleted': false });
             setIsAddedTodo(updatedTodos);
         }
-        else{
+        else {
             setTextError('Title Can not be empty')
         }
     }
@@ -134,7 +133,6 @@ export default function Todos({ cardInfo }) {
                         </IconButton>
                     </Box>
                 }
-                
                 {todos.length > 0 && <Typography variant="h6">Todos</Typography>}
                 {isEdit && <Box sx={{
                     width: '100%',
@@ -151,13 +149,13 @@ export default function Todos({ cardInfo }) {
                     <Button onClick={handleUpdateTodo} variant="contained" sx={{ margin: '10px', width: '5rem' }}>
                         Save
                     </Button>
-                    <IconButton onClick={()=> setIsEdit(false)}>
+                    <IconButton onClick={() => setIsEdit(false)}>
                         <CloseIcon />
                     </IconButton>
                 </Box>}
                 <Box sx={{ height: '15rem' }}>
                     <Box sx={{ overflowY: 'auto', height: '100%' }}>
-                        <ToastContainer/>
+                        <ToastContainer />
                         {todos.length > 0 && todos.map((todo, index) => (
                             <Box key={index}
                                 sx={{
@@ -172,7 +170,9 @@ export default function Todos({ cardInfo }) {
                                     alignItems: 'center'
                                 }}
                             >
-                                <Typography variant="h6">{todo.todoTitle}</Typography>
+                                <Typography variant="h6" style={{ textDecoration: todo.isCompleted? 'line-through':'' }}>
+                                    {todo.todoTitle}
+                                </Typography>
                                 <Box sx={{ display: 'flex', gap: '1rem' }}>
                                     <Checkbox
                                         {...label}

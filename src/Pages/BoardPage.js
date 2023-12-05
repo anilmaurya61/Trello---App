@@ -35,7 +35,6 @@ import {
 } from '@mui/icons-material';
 
 
-
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -89,7 +88,6 @@ export default function PersistentDrawerLeft() {
     const [boards, setBoards] = useState([]);
     const [imageData, setImageData] = useState([]);
     const { user, signOut } = useAuth();
-    const [listsCount, setListsCount] = useState(1);
     const [currentBoard, setCurrentBoard] = useState(null);
     const [currentBoardLists, setCurrentBoardLists] = useState([]);
     const [boardDetails, setboardDetails] = useState(null);
@@ -101,9 +99,6 @@ export default function PersistentDrawerLeft() {
     const handleBoardDetails = () =>{
         setboardDetails(getId())
     }
-    const handleListClick = () => {
-        setListsCount(prevCount => prevCount + 1);
-    };
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -139,8 +134,12 @@ export default function PersistentDrawerLeft() {
             setCurrentBoardLists(Lists)
         }
         fetchBoard(boardId)
-    }, [boardId,boardDetails])
-
+    }, [boardId,setboardDetails])
+    
+    async function fetchLists({boardId}){
+        let Lists = await getListsById(boardId);
+            setCurrentBoardLists(Lists)
+    }
 
     async function handleDeleteBoard(id) {
         try {
@@ -160,7 +159,6 @@ export default function PersistentDrawerLeft() {
             <MyApp dynamicTitle={boardName} />
             <ToastContainer />
             <Box sx={{ display: 'flex'}}>
-
                 <CssBaseline />
                 <AppBar position="fixed" open={open} >
                     <Toolbar>
@@ -250,12 +248,12 @@ export default function PersistentDrawerLeft() {
                     {currentBoardLists?.allLists &&
                         <Box sx={{ display: 'flex', gap: '1rem', alignItems:"start" }}>
                             {currentBoardLists.allLists.map((list, index) => (
-                                <Cards setboardDetails = {handleBoardDetails} key={index} position = {index} length={currentBoardLists.allLists.length-1} listData={list} />
+                                <Cards setboardDetails = {handleBoardDetails} fetchLists = {fetchLists} key={index} position = {index} length={currentBoardLists.allLists.length-1} listData={list} />
                             ))}
                             
                         </Box>
                     }
-                        <Lists setboardDetails = {handleBoardDetails} />
+                        <Lists fetchLists ={fetchLists} setboardDetails = {handleBoardDetails} />
                     </Box>
                 </Main>
                     :

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Button, TextField, Box, Typography, IconButton, Skeleton } from '@mui/material';
+import { Button, TextField, Box, Typography, IconButton} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
+
     AddOutlined as AddIcon,
     Close as CloseIcon,
     Edit as EditIcon,
@@ -9,9 +11,11 @@ import {
     ArrowRight as ArrowRightIcon,
     ArrowDropUp as ArrowDropUpIcon,
     ArrowDropDown as ArrowDropDownIcon,
+
 } from '@mui/icons-material';
 import CardDetails from "./CardDetails";
 import {
+
     createCard,
     deleteList,
     deleteCard,
@@ -21,13 +25,13 @@ import {
     shiftCardUp,
     shiftCardDown,
     cardRightShift,
-    cardLeftShift
+    cardLeftShift,
 
 } from '../services/firestoreService'
 import { useParams } from "react-router-dom";
 
 
-export default function Cards({ position, length, listData, setboardDetails }) {
+export default function Cards({fetchLists, position, length, listData, setboardDetails }) {
 
     const [addaCard, setAddaCard] = useState(true);
     const [cards, setCards] = useState([]);
@@ -46,30 +50,29 @@ export default function Cards({ position, length, listData, setboardDetails }) {
 
     const handleCardLeft = async (cardId) => {
         await cardLeftShift({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
-        setboardDetails();
+        await fetchLists({'boardId': boardId});
     }
 
     const handleCardRight = async (cardId) => {
         await cardRightShift({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
-        setboardDetails();
+        await fetchLists({'boardId': boardId});
     }
     const handleArrowLeft = async () => {
         await shiftLeftList({ 'boardId': boardId, 'listId': listData.id });
-        setboardDetails();
+        await fetchLists({'boardId': boardId});
     }
-
     const handleArrowRight = async () => {
         await shiftRightList({ 'boardId': boardId, 'listId': listData.id })
-        setboardDetails();
+        await fetchLists({'boardId': boardId});
     }
 
     const handleCardUp = async (cardId) => {
         await shiftCardUp({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
-        setboardDetails();
+        await fetchLists({'boardId': boardId});
     }
     const handleCardDown = async (cardId) => {
         await shiftCardDown({ 'boardId': boardId, 'listId': listData.id, 'cardId': cardId })
-        setboardDetails();
+        await fetchLists({'boardId': boardId});
     }
     const handleCardEditTitleChange = (event) => {
         setEditedCard(event.target.value)
@@ -115,28 +118,24 @@ export default function Cards({ position, length, listData, setboardDetails }) {
     const handleAddCard = async () => {
         if (cardTitle !== '') {
             setLoading(true)
-            setCardTitle('');
-            setAddaCard(true);
             await createCard({ 'cardTitle': cardTitle, 'boardId': boardId, 'listId': listData.id });
-            setboardDetails();
+            await fetchLists({'boardId':boardId})
             setLoading(false);
+            setCardTitle('');
         }
     }
 
     const handleListDelete = async () => {
         await deleteList({ 'boardId': boardId, 'listId': listData.id })
-        setboardDetails();
-    }
+        await fetchLists({'boardId': boardId});    }
     const handleCardDelete = async (id) => {
-        let cardsData = cards.filter(c => c.cardId == id);
-        setCards(cardsData)
         await deleteCard({ 'boardId': boardId, 'listId': listData.id, 'cardId': id })
-        setboardDetails();
+        await fetchLists({'boardId': boardId});
     };
 
     return (
         <>
-            <Box sx={{ width: '300px', backgroundColor: '#ebecf0', borderRadius: '10px', padding: '16px' }}>
+            <Box sx={{ width: '300px', backgroundColor: '#ebecf0', borderRadius: '10px', padding: '16px', transition: 'transform 0.3s ease-in-out', }}>
                 <Box sx={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <Box>
                         {position > 0 ? <IconButton >
@@ -246,7 +245,6 @@ export default function Cards({ position, length, listData, setboardDetails }) {
                     )
                 })
                 }
-                {loading && <Skeleton variant="rounded" sx={{marginLeft:'10px'}} height={80} />}
 
                 {addaCard ?
                     <Button onClick={handleAddaCard} variant="outlined" startIcon={<AddIcon />} sx={{ margin: '10px', width: '75%' }}>
@@ -261,15 +259,14 @@ export default function Cards({ position, length, listData, setboardDetails }) {
                         boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.3)',
                     }}>
                         <TextField value={cardTitle} onChange={handleCardTitleChange} label="Card title" variant="outlined" sx={{ marginBottom: '10px', width: '100%' }} />
-                        <Button onClick={handleAddCard} variant="outlined" sx={{ margin: '10px', width: '65%' }}>
+                        <LoadingButton loading = {loading} onClick={handleAddCard} variant="outlined" sx={{ margin: '10px', width: '65%' }}>
                             Add Card
-                        </Button>
+                        </LoadingButton>
                         <IconButton onClick={handleAddaCard}>
                             <CloseIcon />
                         </IconButton>
                     </Box>
                 }
-
             </Box>
             {cardDetailsState && <CardDetails setCardDetailsState={handleCardDetailsState} cardDetailsData={cardDetailsData} />}
         </>

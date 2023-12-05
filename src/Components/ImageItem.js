@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 
-function ImageItem({ item, onClick }) {
+function ImageItem({ item, onClick, isSelected}) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const handleImageLoad = () => {
     setIsLoaded(true);
   };
-
   return (
-    <div>
-      <div style={{display:'flex', justifyContent:'center', alignItems:'center'}}>{!isLoaded && <CircularProgress />}</div>
-      <img 
+    <div style={{display:'flex',justifyContent:'center', alignItems:'center', height: '100px', width: '100px', border: isSelected ? '5px solid green' : 'none', borderRadius: '10px', overflow: 'hidden' }}>
+      {!isLoaded && <CircularProgress />}
+      <img
         src={item}
         alt={item}
-        onClick={() => onClick(item)}
+        onClick={() => {
+          onClick(item);
+        }}
         onLoad={handleImageLoad}
-        style={{ display: isLoaded ? 'block' : 'none', height:'auto', width:'100%' }}
+        style={{ display: isLoaded ? 'block' : 'none', height: '100%', width: '100%' }}
       />
     </div>
   );

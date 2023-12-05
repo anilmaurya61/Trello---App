@@ -9,7 +9,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import ImageItem from './ImageItem';
 
 const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
-  const [selectedImage, setSelectedImage] = useState("https://firebasestorage.googleapis.com/v0/b/trello-app-13979.appspot.com/o/Images%2Fimage7.jpg?alt=media&token=b2b60508-605a-4ff9-ba6b-e2ff3ba3a20b")
+  const [selectedImage, setSelectedImage] = useState("https://firebasestorage.googleapis.com/v0/b/trello-app-13979.appspot.com/o/Images%2Fimage1.jpg?alt=media&token=57faea79-579b-45a0-bced-eaaac4dd9548")
   const [boardName, setBoardName] = useState("");
   const [loading, setLoading] = useState(false);
   const [textError, setTextError] = useState('');
@@ -55,7 +55,7 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
           top: 0,
           left: 0,
           width: '100%',
-          height: '100%',
+          height: '100vh',
           backdropFilter: 'blur(0.7px)',
           zIndex: 1,
           display: 'flex',
@@ -65,38 +65,37 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
       >
         <Box
           sx={{
-            height: '70%',
-            width: '60%',
             background: 'white',
             position: 'absolute',
+            padding: '30px',
             top: '15%',
             boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.3)',
             borderRadius: '10px',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
+            gap: '1rem',
             alignItems: 'center',
+            zIndex:2
           }}
         >
           <TextField error={textError !== ''} helperText={textError !== '' ? 'Board name cannot be empty' : ''}
-            id="outlined-error" value={boardName} onChange={handleBoardNameChange} label="Enter Board  Name here ..." variant="outlined" sx={{ width: '30rem', marginTop: '5rem' }} />
+            id="outlined-error" value={boardName} onChange={handleBoardNameChange} label="Enter Board  Name here ..." variant="outlined" sx={{ width: '28rem', margin:'20px 30px' }} />
           <span style={{ margin: '10px', color: 'grey' }}>Select Board Background</span>
-          <Box sx={{Height:'50px'}}>
-            <ImageList sx={{ width: 450, height: 150, marginTop: '10px' }} cols={4} rowHeight={100} rows={3}>
+          <Box>
+            <ImageList sx={{ width: 450, marginTop: '10px' }} cols={4} rowHeight={100} rows={2}>
               {imageData.map((item, index) => (
                 <ImageListItem key={index} >
-                  <ImageItem key={index} item={item} onClick={setSelectedImage} />
+                  <ImageItem
+                    key={index}
+                    item={item}
+                    onClick={setSelectedImage}
+                    isSelected={selectedImage === item}
+                  />
                 </ImageListItem>
               ))}
             </ImageList>
           </Box>
-          <span style={{ margin: '5px', color: 'grey' }}>Board Background</span>
-          <img
-            src={selectedImage}
-            alt="selected image"
-            style={{ height: '80px', margin: '1rem' }}
-          />
-          <Stack direction="row" spacing={2} sx={{ marginBottom: '20px' }}>
+          <Stack direction="row" spacing={2} sx={{ margin: '20px' }}>
             <LoadingButton
               onClick={handleCreateBoard}
               startIcon={<AddCircleOutlineIcon />}
