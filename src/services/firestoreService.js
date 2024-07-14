@@ -693,7 +693,7 @@ const cardRightShift = async (cardData) => {
 
         const updatedNextList = {
           ...nextList,
-          Cards: [...nextList.Cards, foundCard],
+          Cards: [...nextList.Cards || [], foundCard],
         };
 
         updatedLists[nextListIndex] = updatedNextList;
@@ -742,7 +742,7 @@ const cardLeftShift = async (cardData) => {
 
         const updatedPrevList = {
           ...prevList,
-          Cards: [...prevList.Cards, foundCard],
+          Cards: [...prevList.Cards || [], foundCard],
         };
 
         updatedLists[prevListIndex] = updatedPrevList;
