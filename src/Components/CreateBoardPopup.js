@@ -75,11 +75,11 @@ const CreateBoardPopup = ({ closeCreateBoardPopup, imageData, userId }) => {
             flexDirection: 'column',
             gap: '1rem',
             alignItems: 'center',
-            zIndex:2
+            zIndex: 2
           }}
         >
           <TextField error={textError !== ''} helperText={textError !== '' ? 'Board name cannot be empty' : ''}
-            id="outlined-error" value={boardName} onChange={handleBoardNameChange} label="Enter Board  Name here ..." variant="outlined" sx={{ width: '28rem', margin:'20px 30px' }} />
+            id="outlined-error" value={boardName} onChange={handleBoardNameChange} label="Enter Board  Name here ..." variant="outlined" sx={{ width: '28rem', margin: '20px 30px' }} />
           <span style={{ margin: '10px', color: 'grey' }}>Select Board Background</span>
           <Box>
             <ImageList sx={{ width: 450, marginTop: '10px' }} cols={4} rowHeight={100} rows={2}>
