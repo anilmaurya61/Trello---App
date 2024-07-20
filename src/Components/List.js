@@ -14,7 +14,7 @@ const List = ({ fetchLists }) => {
   const handleCreateLists = async () => {
     setLoading(true);
     await createLists({ 'boardId': boardId, 'listTitle': listTitle })
-    await fetchLists({'boardId': boardId});
+    await fetchLists({ 'boardId': boardId });
     setLoading(false)
     setShowCard(false)
     setListTitle('');
@@ -23,10 +23,10 @@ const List = ({ fetchLists }) => {
     <>
       <Box sx={{ minWidth: '300px' }}>
         {!showCard ?
-           <AddList isLoading = {isLoading} handleCreateLists={handleCreateLists} setListTitle={setListTitle} setShowCard={setShowCard}/>
+          <AddList isLoading={isLoading} handleCreateLists={handleCreateLists} setListTitle={setListTitle} setShowCard={setShowCard} />
           :
           <Box sx={{ display: 'flex', gap: '1rem' }}>
-           <AddList isLoading = {isLoading} handleCreateLists={handleCreateLists} setListTitle={setListTitle} setShowCard={setShowCard} />
+            <AddList isLoading={isLoading} handleCreateLists={handleCreateLists} setListTitle={setListTitle} setShowCard={setShowCard} />
           </Box>
         }
       </Box>
